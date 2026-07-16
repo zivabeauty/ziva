@@ -82,22 +82,7 @@ export const heroSlides: HeroSlide[] = [
     titleAccent: "That Lasts",
     description: "Nourish. Repair. Radiate. Beauty that stays with you — featuring our Keratin Mask."
   },
-  {
-    id: 2,
-    image: "/ziva_banner.png",
-    tagline: "Love Your Skin",
-    title: "The Ziva",
-    titleAccent: "Collection",
-    description: "24K gold serums, rice milk, and ceramide creams — curated for radiant, nourished skin."
-  },
-  {
-    id: 3,
-    image: "/banner_image.jpg",
-    tagline: "Clean Beauty",
-    title: "Skincare",
-    titleAccent: "Essentials",
-    description: "Minimal formulas and everyday rituals for skin that looks as good as it feels."
-  }
+  
 ];
 
 /* ═══════════════════════════════════════════════ */
