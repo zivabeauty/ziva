@@ -3,18 +3,20 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Search, 
-  Heart, 
-  ShoppingBag, 
-  Menu, 
-  X, 
-  Trash2, 
-  Plus, 
-  Minus, 
+import {
+  Search,
+  Heart,
+  ShoppingBag,
+  Menu,
+  X,
+  Trash2,
+  Plus,
+  Minus,
   Sparkles,
   ArrowRight,
-  Truck
+  Truck,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import Magnetic from "./Magnetic";
 import type { OrderRecord, WishlistItem } from "@/lib/cart-types";
@@ -326,136 +328,127 @@ export default function Navbar() {
 
   return (
     <>
-      {/* 1. Global Announcement Bar (Rotating) */}
-      <div className="w-full candy-gradient-bg text-white text-center py-2.5 px-4 text-[9px] sm:text-[10px] tracking-[0.25em] uppercase font-semibold select-none relative z-50 h-[38px] overflow-hidden">
-        <div className="max-w-7xl mx-auto flex justify-between items-center px-4 h-full">
-          <span className="hidden sm:inline text-white/80 text-[8px] tracking-[0.2em]">ZIVA BEAUTY</span>
-          <div className="relative flex-grow h-4 flex items-center justify-center">
-              {offersList.map((offer, i) => (
-                <span
-                  key={i}
-                  className={`absolute text-center flex items-center justify-center gap-1.5 transition-all duration-500 ease-in-out ${
-                    i === currentOfferIndex
-                      ? "opacity-100 translate-y-0 text-white"
-                      : "opacity-0 -translate-y-3 text-white/0 pointer-events-none"
-                  }`}
-                >
-                  {offer}
-                </span>
-              ))}
-            </div>
-          <span className="hidden md:inline text-white font-bold tracking-[0.2em] hover:opacity-85 transition-opacity cursor-pointer text-[8px]">Join The Circle</span>
+      {/* 1. Global Announcement Bar (centered, arrow-cycled) */}
+      <div className="w-full candy-gradient-bg text-white select-none relative z-50 h-[38px] flex items-center">
+        <div className="max-w-3xl mx-auto w-full flex items-center justify-center gap-3 px-4 h-full">
+          <button
+            onClick={() => setCurrentOfferIndex((p) => (p - 1 + offersList.length) % offersList.length)}
+            aria-label="Previous offer"
+            className="p-1 text-white/60 hover:text-white transition-colors cursor-pointer"
+          >
+            <ChevronLeft className="w-3.5 h-3.5" />
+          </button>
+          <div className="relative flex-1 h-4 flex items-center justify-center overflow-hidden">
+            {offersList.map((offer, i) => (
+              <span
+                key={i}
+                className={`absolute text-center text-[9px] sm:text-[10px] tracking-[0.22em] uppercase font-semibold transition-all duration-500 ease-in-out ${
+                  i === currentOfferIndex
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 -translate-y-3 pointer-events-none"
+                }`}
+              >
+                {offer}
+              </span>
+            ))}
+          </div>
+          <button
+            onClick={() => setCurrentOfferIndex((p) => (p + 1) % offersList.length)}
+            aria-label="Next offer"
+            className="p-1 text-white/60 hover:text-white transition-colors cursor-pointer"
+          >
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
         </div>
       </div>
 
-      {/* 2. Sticky Navbar with Dot & Key Design System (Double Deck) */}
+      {/* 2. Sticky single-row Navbar — logo left · centered links · icons right */}
       <header className={`fixed z-40 w-full transition-all duration-300 ease-in-out bg-white/95 backdrop-blur-md shadow-[0_4px_24px_rgba(0,0,0,0.03)] border-b border-stone-100 ${
         scrolled ? "top-0" : "top-[38px]"
       } ${
         visible ? "translate-y-0" : "-translate-y-[100%]"
       }`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          {/* A. UPPER NAVBAR ROW */}
-          <div className="flex items-center justify-between py-3 border-b border-stone-100/60">
-            
-            {/* Left: Hamburger & Logo */}
-            <div className="flex items-center gap-4">
-              <button 
-                onClick={() => setIsMobileMenuOpen(true)}
-                className="lg:hidden transition-colors p-1 text-ink hover:text-lavender cursor-pointer"
-                aria-label="Open Mobile Menu"
-              >
-                <Menu className="w-5 h-5" />
-              </button>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[68px] flex items-center justify-between">
 
-              <Link href="/" className="group flex items-center gap-1.5 select-none">
-                <Image src="/ziva_beauty_logo.png" alt="ZIVA" width={100} height={100} />
-              </Link>   
-            </div>
-
-            {/* Center: Search Input Bar (Desktop only) */}
-            <div className="hidden lg:flex items-center relative max-w-md w-full mx-8">
-              <input
-                type="text"
-                placeholder="Search products, ingredients, concerns..."
-                value={searchQuery}
-                onFocus={() => setIsSearchOpen(true)}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-5 pr-10 py-2.5 bg-stone-50 border border-stone-200 focus:outline-none focus:border-lavender text-xs text-ink font-semibold rounded-full shadow-inner transition-colors focus:bg-white"
+          {/* Left: Hamburger (mobile) + Logo */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="lg:hidden p-1 text-ink hover:text-gold-deep transition-colors cursor-pointer"
+              aria-label="Open menu"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+            <Link href="/" className="flex items-center select-none">
+              <Image
+                src="/ziva_beauty_logo.png"
+                alt="ZIVA"
+                width={120}
+                height={48}
+                priority
+                className="h-10 w-auto object-contain"
               />
-              <Search className="w-4 h-4 text-stone-400 absolute right-4 top-1/2 -translate-y-1/2" />
-            </div>
-
-            {/* Right: Icons (Track Order, Search, Wishlist, Cart) */}
-            <div className="flex items-center gap-1 sm:gap-2">
-              
-              {/* Track Order Trigger */}
-              <button 
-                onClick={() => setIsTrackOrderOpen(true)}
-                className="flex items-center gap-1.5 px-3 py-2 text-ink hover:text-lavender transition-all relative cursor-pointer hover:scale-105"
-                title="Track your order"
-              >
-                <Truck className="w-4.5 h-4.5" />
-                <span className="hidden md:inline text-xs font-bold uppercase tracking-wider">Track Order</span>
-              </button>
-
-              {/* Mobile Search Trigger */}
-              <button 
-                onClick={() => setIsSearchOpen(true)}
-                className="lg:hidden p-2 transition-all cursor-pointer hover:scale-110 text-ink hover:text-lavender"
-                aria-label="Search"
-              >
-                <Search className="w-4.5 h-4.5" />
-              </button>
-
-              {/* Wishlist Trigger */}
-              <button 
-                onClick={() => setIsWishlistOpen(true)}
-                className="p-2 transition-all relative cursor-pointer hover:scale-110 text-ink hover:text-lavender"
-                aria-label="Wishlist"
-              >
-                <Heart className="w-4.5 h-4.5" />
-                {wishlistItems.length > 0 && (
-                  <span className="absolute top-1.5 right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-pink text-[8px] font-bold text-white border border-white">
-                    {wishlistItems.length}
-                  </span>
-                )}
-              </button>
-
-              {/* Shopping Cart Trigger */}
-              <button 
-                onClick={() => openCart("cart")}
-                className="p-2 transition-all relative cursor-pointer hover:scale-110 text-ink hover:text-lavender"
-                aria-label="Open Shopping Cart"
-              >
-                <ShoppingBag className="w-4.5 h-4.5" />
-                {cartCount > 0 && (
-                  <span className="absolute top-1.5 right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-mint text-[8px] font-bold text-white border border-white">
-                    {cartCount}
-                  </span>
-                )}
-              </button>
-
-            </div>
-
+            </Link>
           </div>
 
-          {/* B. LOWER NAVBAR ROW (Centered navigation links, Desktop only) */}
-          <div className="hidden lg:flex justify-center items-center py-2 text-xs">
-            <nav className="flex items-center gap-8">
-              {menuItems.map((item) => (
-                <div key={item.name} className="relative group/nav py-1.5">
-                  <Link
-                    href={item.href}
-                    className="relative text-sm font-bold tracking-wider uppercase transition-all duration-300 flex items-center gap-1 text-ink hover:text-lavender"
-                  >
-                    {item.name}
-                    <span className="absolute bottom-[-2px] left-0 w-0 h-[2.5px] rounded-full candy-gradient-bg transition-all duration-300 group-hover/nav:w-full"></span>
-                  </Link>
-                </div>
-              ))}
-            </nav>
+          {/* Center: Category nav (desktop) — absolutely centered */}
+          <nav className="hidden lg:flex items-center gap-7 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            {menuItems.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className="group relative text-[13px] font-bold uppercase tracking-[0.12em] text-ink hover:text-gold-deep transition-colors"
+              >
+                {item.name}
+                <span className="absolute -bottom-1.5 left-0 h-[2px] w-0 rounded-full bg-gold-deep transition-all duration-300 group-hover:w-full" />
+              </Link>
+            ))}
+          </nav>
+
+          {/* Right: Icons — Search, Track, Wishlist, Cart */}
+          <div className="flex items-center gap-0.5 sm:gap-1">
+            <button
+              onClick={() => setIsSearchOpen(true)}
+              className="p-2 text-ink hover:text-gold-deep transition-colors cursor-pointer"
+              aria-label="Search"
+            >
+              <Search className="w-5 h-5" />
+            </button>
+
+            <button
+              onClick={() => setIsTrackOrderOpen(true)}
+              className="hidden sm:inline-flex p-2 text-ink hover:text-gold-deep transition-colors cursor-pointer"
+              title="Track your order"
+              aria-label="Track order"
+            >
+              <Truck className="w-5 h-5" />
+            </button>
+
+            <button
+              onClick={() => setIsWishlistOpen(true)}
+              className="p-2 relative text-ink hover:text-gold-deep transition-colors cursor-pointer"
+              aria-label="Wishlist"
+            >
+              <Heart className="w-5 h-5" />
+              {wishlistItems.length > 0 && (
+                <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-gold-deep text-[8px] font-bold text-white border border-white">
+                  {wishlistItems.length}
+                </span>
+              )}
+            </button>
+
+            <button
+              onClick={() => openCart("cart")}
+              className="p-2 relative text-ink hover:text-gold-deep transition-colors cursor-pointer"
+              aria-label="Open Shopping Cart"
+            >
+              <ShoppingBag className="w-5 h-5" />
+              {cartCount > 0 && (
+                <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-ink text-[8px] font-bold text-white border border-white">
+                  {cartCount}
+                </span>
+              )}
+            </button>
           </div>
 
         </div>

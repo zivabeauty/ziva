@@ -10,7 +10,7 @@ export default function SiteLayout({
   return (
     <>
       <Navbar />
-      <main className="flex-grow flex flex-col pt-[102px] lg:pt-[142px]">
+      <main className="flex-grow flex flex-col pt-[68px]">
         {children}
       </main>
       <Footer />
