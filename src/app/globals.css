@@ -64,13 +64,7 @@ html {
 }
 
 body {
-  /* Warm sand glows over ivory so plain sections never read as flat/empty */
-  background:
-    radial-gradient(55% 45% at 88% 2%, rgba(226, 185, 157, 0.20), transparent 60%),
-    radial-gradient(48% 40% at 4% 98%, rgba(226, 185, 157, 0.16), transparent 55%),
-    radial-gradient(40% 35% at 50% 45%, rgba(226, 185, 157, 0.07), transparent 60%),
-    var(--background);
-  background-attachment: fixed;
+  background: var(--background);
   color: var(--foreground);
   font-family: var(--font-inter), sans-serif;
   overflow-x: hidden;
@@ -79,10 +73,21 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Page-wide fine "apothecary paper" grain — fills empty space with subtle
-   texture. Sits behind all content (which paints on its own backgrounds),
-   so it only shows through the gaps and margins. */
+/* Warm sand glows + fine "apothecary paper" grain, painted ONCE on a fixed,
+   composited layer behind all content — so they fill the empty gaps/margins
+   without repainting on scroll (no jank). */
 body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(55% 45% at 88% 2%, rgba(226, 185, 157, 0.20), transparent 60%),
+    radial-gradient(48% 40% at 4% 98%, rgba(226, 185, 157, 0.16), transparent 55%),
+    radial-gradient(40% 35% at 50% 45%, rgba(226, 185, 157, 0.07), transparent 60%);
+}
+body::after {
   content: "";
   position: fixed;
   inset: 0;

@@ -1,17 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Sparkles, Droplet, Gem, ArrowRight } from "lucide-react";
 
-// 3D is heavy + client-only: load it lazily so it never blocks first paint.
-const SerumScene = dynamic(() => import("./three/SerumScene"), {
-  ssr: false,
-  loading: () => <OrbFallback pulse />,
-});
-
-/** Pure-CSS gold glass orb — shown on mobile, with reduced motion, or while the 3D loads. */
+/** Pure-CSS gold glass orb — lightweight centerpiece (no WebGL / three.js). */
 function OrbFallback({ pulse = false }: { pulse?: boolean }) {
   return (
     <div className="absolute inset-0 flex items-center justify-center">
@@ -34,24 +26,6 @@ function OrbFallback({ pulse = false }: { pulse?: boolean }) {
 }
 
 export default function SerumShowcase() {
-  const [enable3D, setEnable3D] = useState(false);
-
-  useEffect(() => {
-    const reducedMq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const wideMq = window.matchMedia("(min-width: 768px)");
-    // Respect data-saver where exposed.
-    const saveData = (navigator as unknown as { connection?: { saveData?: boolean } }).connection?.saveData;
-    const update = () => setEnable3D(wideMq.matches && !reducedMq.matches && !saveData);
-    update();
-    // Re-evaluate on viewport / preference changes (rotate, resize, a11y toggle).
-    wideMq.addEventListener("change", update);
-    reducedMq.addEventListener("change", update);
-    return () => {
-      wideMq.removeEventListener("change", update);
-      reducedMq.removeEventListener("change", update);
-    };
-  }, []);
-
   const highlights = [
     { icon: Gem, label: "24K Gold Complex", sub: "Visible luminosity" },
     { icon: Droplet, label: "Hyaluronic Depth", sub: "72-hour hydration" },
@@ -71,7 +45,7 @@ export default function SerumShowcase() {
           <h2 className="display-xl text-4xl sm:text-5xl lg:text-6xl text-cream mb-6">
             Liquid Gold,
             <br />
-            <span className="candy-gradient-text">Bottled</span>
+            <span className="candy-gradient-text on-dark">Bottled</span>
           </h2>
           <p className="text-cream/65 text-sm sm:text-base font-light leading-relaxed max-w-md mb-10">
             Every Ziva serum is a suspension of light — gold-standard actives held
@@ -99,7 +73,7 @@ export default function SerumShowcase() {
           </Link>
         </div>
 
-        {/* 3D stage */}
+        {/* Orb stage */}
         <div className="order-1 lg:order-2 relative">
           <div className="relative mx-auto aspect-square w-full max-w-[520px]">
             {/* glow plate behind the object */}
@@ -107,10 +81,10 @@ export default function SerumShowcase() {
               className="pointer-events-none absolute inset-8 rounded-full"
               style={{ background: "radial-gradient(circle, rgba(201,169,97,0.16), transparent 62%)" }}
             />
-            {enable3D ? <SerumScene /> : <OrbFallback pulse />}
+            <OrbFallback pulse />
 
             <span className="absolute bottom-4 left-1/2 -translate-x-1/2 glass-panel-dark px-4 py-2 rounded-full text-[9px] font-bold uppercase tracking-[0.25em] text-gold">
-              L'Or de Ziva · Nourishing Elixir
+              L&apos;Or de Ziva · Nourishing Elixir
             </span>
           </div>
         </div>
