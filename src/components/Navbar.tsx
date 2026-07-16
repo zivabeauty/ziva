@@ -383,8 +383,8 @@ export default function Navbar() {
               <Image
                 src="/ziva_beauty_logo.png"
                 alt="ZIVA"
-                width={120}
-                height={48}
+                width={186}
+                height={120}
                 priority
                 className="h-10 w-auto object-contain"
               />
