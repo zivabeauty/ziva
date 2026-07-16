@@ -363,7 +363,7 @@ export default function Navbar() {
       </div>
 
       {/* 2. Sticky single-row Navbar — logo left · centered links · icons right */}
-      <header className={`fixed z-40 w-full transition-all duration-300 ease-in-out bg-white/95 backdrop-blur-md shadow-[0_4px_24px_rgba(0,0,0,0.03)] border-b border-stone-100 ${
+      <header className={`fixed z-40 w-full transition-all duration-300 ease-in-out bg-white shadow-[0_4px_24px_rgba(0,0,0,0.03)] border-b border-stone-100 ${
         scrolled ? "top-0" : "top-[38px]"
       } ${
         visible ? "translate-y-0" : "-translate-y-[100%]"

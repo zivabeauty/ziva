@@ -33,10 +33,16 @@ export default function SerumShowcase() {
   ];
 
   return (
-    <section className="ink-surface grain relative overflow-hidden">
-      {/* soft gold vignettes */}
-      <div className="pointer-events-none absolute -left-24 top-1/4 h-72 w-72 rounded-full bg-gold/10 blur-[100px]" />
-      <div className="pointer-events-none absolute -right-16 bottom-0 h-80 w-80 rounded-full bg-gold/[0.07] blur-[110px]" />
+    <section className="ink-surface relative overflow-hidden">
+      {/* soft sand vignettes — radial gradients (no expensive blur filter) */}
+      <div
+        className="pointer-events-none absolute -left-24 top-1/4 h-72 w-72 rounded-full"
+        style={{ background: "radial-gradient(circle, rgba(226,185,157,0.14), transparent 70%)" }}
+      />
+      <div
+        className="pointer-events-none absolute -right-16 bottom-0 h-80 w-80 rounded-full"
+        style={{ background: "radial-gradient(circle, rgba(226,185,157,0.10), transparent 70%)" }}
+      />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-28 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
         {/* Copy */}

@@ -16,8 +16,7 @@ import {
   ArrowLeft,
   Share2,
   ChevronDown,
-  Info,
-  Sparkles
+  Info
 } from "lucide-react";
 import Tilt from "@/components/Tilt";
 import Magnetic from "@/components/Magnetic";
@@ -322,76 +321,6 @@ export default function ProductPage() {
         </div>
 
       </div>
-
-      {/* FREQUENTLY BOUGHT TOGETHER BUNDLE WIDGET */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-stone-150 mt-12 select-none">
-        <div className="bg-[#FAF8F5] border border-stone-200/50 rounded-[28px] p-6 sm:p-8">
-          <h3 className="text-sm font-semibold tracking-wide font-serif text-[#111111] uppercase mb-6 flex items-center gap-2">
-            <Sparkles className="w-4.5 h-4.5 text-[#C9A961]" /> Frequently Bought Together
-          </h3>
-
-          <div className="flex flex-col lg:flex-row items-center gap-8 justify-between">
-            {/* Bundle product line-up */}
-            <div className="flex flex-wrap items-center gap-4 justify-center">
-              {/* Product 1 (current) */}
-              <div className="flex items-center gap-3 bg-white p-3 border border-stone-150 rounded-2xl max-w-[220px]">
-                <img src={product.image} alt={product.name} className="w-12 h-12 object-cover rounded-lg border border-stone-200/40" />
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-semibold text-stone-900 line-clamp-1">{product.name}</span>
-                  <span className="text-[10px] text-stone-450">{selectedSize}</span>
-                  <span className="text-xs font-bold text-black">{currentDetail.price}</span>
-                </div>
-              </div>
-
-              <span className="text-lg font-light text-stone-400">+</span>
-
-              {/* Product 2 (Active Glow Cleanser) */}
-              <div className="flex items-center gap-3 bg-white p-3 border border-stone-150 rounded-2xl max-w-[220px]">
-                <img src="https://images.unsplash.com/photo-1556228720-195a672e8a03?q=80&w=150&auto=format&fit=crop" alt="Cleanser Ziva" className="w-12 h-12 object-cover rounded-lg border border-stone-200/40" />
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-semibold text-stone-900 line-clamp-1">Botanical Active Cleanser</span>
-                  <span className="text-[10px] text-stone-450">150 ml</span>
-                  <span className="text-xs font-bold text-black">$35.00</span>
-                </div>
-              </div>
-
-              <span className="text-lg font-light text-stone-400">+</span>
-
-              {/* Product 3 (Hydra Mist Spray) */}
-              <div className="flex items-center gap-3 bg-white p-3 border border-stone-150 rounded-2xl max-w-[220px]">
-                <img src="https://images.unsplash.com/photo-1608248597279-f99d160bfcbc?q=80&w=150&auto=format&fit=crop" alt="Mist spray Ziva" className="w-12 h-12 object-cover rounded-lg border border-stone-200/40" />
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-semibold text-stone-900 line-clamp-1">Active Rose Hydra Mist</span>
-                  <span className="text-[10px] text-stone-450">100 ml</span>
-                  <span className="text-xs font-bold text-black">$28.00</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Price & Checkout CTA */}
-            <div className="flex flex-col gap-3 text-center lg:text-left border-t lg:border-t-0 lg:border-l border-stone-200/80 pt-6 lg:pt-0 lg:pl-10 min-w-[240px]">
-              <div>
-                <span className="text-[9px] uppercase tracking-widest text-stone-400 block mb-1">Bundle Total</span>
-                <div className="flex items-center gap-3 justify-center lg:justify-start">
-                  <span className="text-xl font-bold text-black">${(currentDetail.priceVal + 35 + 28 - 15).toFixed(2)}</span>
-                  <span className="text-xs text-stone-400 line-through font-light">${(currentDetail.priceVal + 35 + 28).toFixed(2)}</span>
-                </div>
-                <span className="text-[8px] uppercase tracking-wider text-emerald-600 font-semibold mt-1 block">Bundle Save: $15.00 (Promo Applied)</span>
-              </div>
-
-              <button
-                onClick={() => {
-                  handleAddToCart();
-                  alert("Bundle items added to Bag successfully!");
-                }}
-                className="w-full py-3 bg-[#111111] text-white hover:bg-[#C9A961] hover:text-black text-[9px] font-bold uppercase tracking-widest transition-colors rounded-full"
-              >
-                Add 3 Items to Bag
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* RELATED PRODUCTS SECTION */}
       <section className="bg-stone-50/50 border-t border-stone-100 py-20 mt-16 select-none">

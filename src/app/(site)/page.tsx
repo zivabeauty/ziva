@@ -768,8 +768,8 @@ export default function Home() {
       {/* SECTION 14 — NEWSLETTER */}
       <section className="mx-auto max-w-4xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="relative flex flex-col items-center gap-5 overflow-hidden rounded-[32px] bg-ink p-8 text-center sm:p-16">
-          <div className="pointer-events-none absolute -right-10 -top-16 h-72 w-72 rounded-full bg-gold/10 blur-3xl" />
-          <div className="pointer-events-none absolute bottom-[-60px] left-1/4 h-64 w-64 rounded-full bg-gold/5 blur-3xl" />
+          <div className="pointer-events-none absolute -right-10 -top-16 h-72 w-72 rounded-full" style={{ background: "radial-gradient(circle, rgba(226,185,157,0.14), transparent 70%)" }} />
+          <div className="pointer-events-none absolute bottom-[-60px] left-1/4 h-64 w-64 rounded-full" style={{ background: "radial-gradient(circle, rgba(226,185,157,0.09), transparent 70%)" }} />
           <span className="relative z-10 rounded-full border border-gold/30 px-4 py-1.5 text-[10px] font-medium uppercase tracking-[0.35em] text-gold">
             The Inner Circle
           </span>
