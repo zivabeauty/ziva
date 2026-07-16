@@ -1,0 +1,386 @@
+@import "tailwindcss";
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 142px;
+}
+@media (max-width: 1024px) {
+  html {
+    scroll-padding-top: 102px;
+  }
+}
+
+:root {
+  /* ─── Warm espresso + sand base (The Skin Story direction) ─── */
+  --background: #FAF7F2;   /* ivory */
+  --foreground: #79443B;   /* cocoa — base body text */
+  --ink: #3D2412;          /* espresso — headings, dark surfaces, buttons */
+  --cream: #FAF7F2;
+  --porcelain: #F4EEE4;    /* soft warm panel */
+
+  /* ─── Accent scale: sand tones (gold removed) ─── */
+  --gold: #E2B99D;         /* sand — fills / borders / hover / dark-band accents */
+  --gold-soft: #F5E7DC;    /* pale sand tint */
+  --gold-deep: #79443B;    /* cocoa accent text on light */
+  --gold-light: #EFD9C8;
+
+  /* ─── Legacy accent tokens, remapped onto the espresso/cocoa/sand scale.
+         Kept so existing `bg-lavender` / `text-mint` / etc. markup renders
+         on-brand without touching every class site. ─── */
+  --mint: #3D2412;         /* → espresso */
+  --mint-soft: #F5E7DC;    /* → pale sand */
+  --coral: #79443B;        /* → cocoa */
+  --coral-soft: #F5E7DC;   /* → pale sand */
+  --lavender: #3D2412;     /* → espresso (primary interactive) */
+  --lavender-soft: #F5E7DC;/* → pale sand */
+  --pink: #79443B;         /* → cocoa */
+  --pink-soft: #F5E7DC;    /* → pale sand */
+  /* --font-inter / --font-playfair are injected by next/font in app/layout.tsx */
+}
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-ink: var(--ink);
+  --color-cream: var(--cream);
+  --color-porcelain: var(--porcelain);
+
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-gold-deep: var(--gold-deep);
+  --color-gold-light: var(--gold-light);
+  --color-mint: var(--mint);
+  --color-mint-soft: var(--mint-soft);
+  --color-coral: var(--coral);
+  --color-coral-soft: var(--coral-soft);
+  --color-lavender: var(--lavender);
+  --color-lavender-soft: var(--lavender-soft);
+  --color-pink: var(--pink);
+  --color-pink-soft: var(--pink-soft);
+
+  --font-sans: var(--font-inter), sans-serif;
+  /* Display serif (Playfair Display), bound to the --font-playfair var. */
+  --font-serif: var(--font-playfair), Georgia, "Times New Roman", serif;
+}
+
+body {
+  /* Warm sand glows over ivory so plain sections never read as flat/empty */
+  background:
+    radial-gradient(55% 45% at 88% 2%, rgba(226, 185, 157, 0.20), transparent 60%),
+    radial-gradient(48% 40% at 4% 98%, rgba(226, 185, 157, 0.16), transparent 55%),
+    radial-gradient(40% 35% at 50% 45%, rgba(226, 185, 157, 0.07), transparent 60%),
+    var(--background);
+  background-attachment: fixed;
+  color: var(--foreground);
+  font-family: var(--font-inter), sans-serif;
+  overflow-x: hidden;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Page-wide fine "apothecary paper" grain — fills empty space with subtle
+   texture. Sits behind all content (which paints on its own backgrounds),
+   so it only shows through the gaps and margins. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+}
+
+/* Display headings: elegant serif, refined tracking */
+.font-serif {
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+/* ─── Premium display type helpers ─── */
+.display-xl {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.02;
+}
+.tracking-luxe { letter-spacing: 0.32em; }
+
+/* Eyebrow / kicker label */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.66rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.32em;
+  color: var(--gold-deep);
+}
+.eyebrow::before {
+  content: "";
+  width: 1.75rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold));
+}
+.eyebrow.eyebrow-center::after {
+  content: "";
+  width: 1.75rem;
+  height: 1px;
+  background: linear-gradient(90deg, var(--gold), transparent);
+}
+
+/* Thin gold hairline divider */
+.gold-rule {
+  height: 1px;
+  width: 3.5rem;
+  background: linear-gradient(90deg, var(--gold), rgba(201, 169, 97, 0));
+}
+
+/* Glassmorphism (kept, toned to neutral) */
+.glass-panel {
+  background: rgba(250, 247, 242, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(201, 169, 97, 0.25);
+}
+
+.glass-panel-dark {
+  background: rgba(61, 36, 18, 0.90);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(169, 117, 79, 0.28);
+}
+
+/* ─── Accent words & flourishes (gold removed → solid cocoa) ─── */
+.gold-foil-text,
+.gold-gradient-text,
+.candy-gradient-text {
+  color: var(--gold-deep);
+  -webkit-text-fill-color: var(--gold-deep);
+}
+/* Italic serif accent words look most couture */
+.candy-gradient-text { font-style: italic; }
+
+/* On dark (espresso) bands, flip accent words to sand so they stay legible */
+.on-dark .candy-gradient-text,
+.on-dark.candy-gradient-text,
+.gold-foil-text.on-dark,
+.gold-gradient-text.on-dark {
+  color: var(--gold);
+  -webkit-text-fill-color: var(--gold);
+}
+
+.gold-gradient-bg {
+  background: linear-gradient(135deg, #E2B99D 0%, #C89B7C 50%, #79443B 100%);
+}
+
+/* Dark fill kept for the announcement bar / nav underline */
+.candy-gradient-bg {
+  background: var(--ink);
+}
+
+/* Espresso surface with faint sand vignette — for premium dark bands */
+.ink-surface {
+  background:
+    radial-gradient(120% 120% at 80% 0%, rgba(226,185,157,0.20), transparent 45%),
+    radial-gradient(120% 120% at 0% 100%, rgba(226,185,157,0.12), transparent 40%),
+    #3D2412;
+}
+
+/* Fine grain overlay for luxury texture */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ─── Premium product / content card ─── */
+.card-luxe {
+  background: #fff;
+  border: 1px solid rgba(10, 10, 10, 0.06);
+  box-shadow: 0 1px 2px rgba(10, 10, 10, 0.03);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.5s ease;
+}
+.card-luxe:hover {
+  transform: translateY(-6px);
+  border-color: rgba(201, 169, 97, 0.45);
+  box-shadow: 0 26px 50px -20px rgba(10, 10, 10, 0.22);
+}
+
+/* ─── Premium buttons ─── */
+.btn-luxe {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  padding: 1.05rem 2.2rem;
+  background: var(--ink);
+  color: #fff;
+  overflow: hidden;
+  transition: color 0.4s ease;
+  cursor: pointer;
+}
+.btn-luxe::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #E2B99D, #F0DDCE 50%, #C89B7C);
+  transform: translateY(101%);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 0;
+}
+.btn-luxe:hover::before { transform: translateY(0); }
+.btn-luxe:hover { color: var(--ink); }
+.btn-luxe > * { position: relative; z-index: 1; }
+
+/* Custom selection highlight */
+::selection {
+  background-color: var(--gold);
+  color: #3D2412;
+}
+
+/* ─── Gold shine sweep (subtle, kept) ─── */
+@keyframes gold-shine {
+  0% { transform: translateX(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) rotate(45deg); }
+}
+
+.shine-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.shine-effect::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 30%;
+  height: 200%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.35) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+.shine-effect:hover::after {
+  animation: gold-shine 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ─── Slow, elegant ambient float (used sparingly) ─── */
+@keyframes luxe-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+.animate-luxe-float { animation: luxe-float 7s ease-in-out infinite; }
+
+/* Legacy playful animations neutralized (no-ops). */
+.animate-blob,
+.animate-float-slow,
+.animate-float-reverse,
+.animate-marquee {
+  animation: none !important;
+}
+
+/* Scroll progress bar → thin gold */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--gold);
+  transform-origin: 0%;
+  z-index: 100;
+}
+
+/* Refined scrollbar (thin, stone + gold) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F1ECE3;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D8CBB2;
+  border-radius: 999px;
+  border: 2px solid #F1ECE3;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold);
+}
+
+/* ─── Scroll-reveal fade-in ─── */
+.fade-in-section {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.fade-in-section.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered children reveal (opt-in via .reveal-stagger on parent) */
+.reveal-stagger > * {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-stagger.visible > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-stagger.visible > *:nth-child(2) { transition-delay: 0.08s; }
+.reveal-stagger.visible > *:nth-child(3) { transition-delay: 0.16s; }
+.reveal-stagger.visible > *:nth-child(4) { transition-delay: 0.24s; }
+.reveal-stagger.visible > *:nth-child(5) { transition-delay: 0.32s; }
+.reveal-stagger.visible > *:nth-child(6) { transition-delay: 0.40s; }
+
+/* ─── Accessibility ─── */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .fade-in-section,
+  .reveal-stagger > * {
+    opacity: 1;
+    transform: none;
+  }
+}
