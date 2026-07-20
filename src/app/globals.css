@@ -6,30 +6,28 @@ html {
 }
 
 :root {
-  /* ─── Warm espresso + sand base (The Skin Story direction) ─── */
-  --background: #FAF7F2;   /* ivory */
-  --foreground: #79443B;   /* cocoa — base body text */
-  --ink: #3D2412;          /* espresso — headings, dark surfaces, buttons */
-  --cream: #FAF7F2;
-  --porcelain: #F4EEE4;    /* soft warm panel */
+  /* ─── Clean white + black + gold ─── */
+  --background: #FFFFFF;
+  --foreground: #111111;
+  --ink: #0A0A0A;          /* black — headings, buttons, dark surfaces */
+  --cream: #FFFFFF;
+  --porcelain: #F7F7F5;    /* soft off-white panels */
 
-  /* ─── Accent scale: sand tones (gold removed) ─── */
-  --gold: #E2B99D;         /* sand — fills / borders / hover / dark-band accents */
-  --gold-soft: #F5E7DC;    /* pale sand tint */
-  --gold-deep: #79443B;    /* cocoa accent text on light */
-  --gold-light: #EFD9C8;
+  /* ─── Gold accents ─── */
+  --gold: #C9A961;         /* primary gold */
+  --gold-soft: #F5EEDC;    /* pale gold tint */
+  --gold-deep: #A8841B;    /* deeper gold for text accents */
+  --gold-light: #E8D5A3;
 
-  /* ─── Legacy accent tokens, remapped onto the espresso/cocoa/sand scale.
-         Kept so existing `bg-lavender` / `text-mint` / etc. markup renders
-         on-brand without touching every class site. ─── */
-  --mint: #3D2412;         /* → espresso */
-  --mint-soft: #F5E7DC;    /* → pale sand */
-  --coral: #79443B;        /* → cocoa */
-  --coral-soft: #F5E7DC;   /* → pale sand */
-  --lavender: #3D2412;     /* → espresso (primary interactive) */
-  --lavender-soft: #F5E7DC;/* → pale sand */
-  --pink: #79443B;         /* → cocoa */
-  --pink-soft: #F5E7DC;    /* → pale sand */
+  /* ─── Legacy accent tokens → black / gold ─── */
+  --mint: #0A0A0A;
+  --mint-soft: #F5EEDC;
+  --coral: #A8841B;
+  --coral-soft: #F5EEDC;
+  --lavender: #0A0A0A;
+  --lavender-soft: #F5EEDC;
+  --pink: #0A0A0A;
+  --pink-soft: #F5EEDC;
   /* --font-inter / --font-playfair are injected by next/font in app/layout.tsx */
 }
 
@@ -56,6 +54,9 @@ html {
   --font-sans: var(--font-inter), sans-serif;
   /* Display serif (Playfair Display), bound to the --font-playfair var. */
   --font-serif: var(--font-playfair), Georgia, "Times New Roman", serif;
+
+  /* Shared content width — matches Complete Your Routine / site gutters */
+  --container-8xl: 88rem;
 }
 
 body {
@@ -78,9 +79,9 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background-image:
-    radial-gradient(55% 45% at 88% 2%, rgba(226, 185, 157, 0.20), transparent 60%),
-    radial-gradient(48% 40% at 4% 98%, rgba(226, 185, 157, 0.16), transparent 55%),
-    radial-gradient(40% 35% at 50% 45%, rgba(226, 185, 157, 0.07), transparent 60%);
+    radial-gradient(55% 45% at 88% 2%, rgba(201, 169, 97, 0.12), transparent 60%),
+    radial-gradient(48% 40% at 4% 98%, rgba(201, 169, 97, 0.10), transparent 55%),
+    radial-gradient(40% 35% at 50% 45%, rgba(201, 169, 97, 0.05), transparent 60%);
 }
 
 /* Display headings: elegant serif, refined tracking */
@@ -131,30 +132,28 @@ body::before {
 
 /* Glassmorphism (kept, toned to neutral) */
 .glass-panel {
-  background: rgba(250, 247, 242, 0.72);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(201, 169, 97, 0.25);
+  border: 1px solid rgba(201, 169, 97, 0.28);
 }
 
 .glass-panel-dark {
-  background: rgba(61, 36, 18, 0.90);
+  background: rgba(10, 10, 10, 0.92);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(169, 117, 79, 0.28);
+  border: 1px solid rgba(201, 169, 97, 0.30);
 }
 
-/* ─── Accent words & flourishes (gold removed → solid cocoa) ─── */
+/* ─── Gold accent text ─── */
 .gold-foil-text,
 .gold-gradient-text,
 .candy-gradient-text {
   color: var(--gold-deep);
   -webkit-text-fill-color: var(--gold-deep);
 }
-/* Italic serif accent words look most couture */
-.candy-gradient-text { font-style: italic; }
+.candy-gradient-text { font-style: normal; }
 
-/* On dark (espresso) bands, flip accent words to sand so they stay legible */
 .on-dark .candy-gradient-text,
 .on-dark.candy-gradient-text,
 .gold-foil-text.on-dark,
@@ -164,20 +163,19 @@ body::before {
 }
 
 .gold-gradient-bg {
-  background: linear-gradient(135deg, #E2B99D 0%, #C89B7C 50%, #79443B 100%);
+  background: linear-gradient(135deg, #E8D5A3 0%, #C9A961 50%, #A8841B 100%);
 }
 
-/* Dark fill kept for the announcement bar / nav underline */
 .candy-gradient-bg {
   background: var(--ink);
 }
 
-/* Espresso surface with faint sand vignette — for premium dark bands */
+/* Black surface with soft gold vignette */
 .ink-surface {
   background:
-    radial-gradient(120% 120% at 80% 0%, rgba(226,185,157,0.20), transparent 45%),
-    radial-gradient(120% 120% at 0% 100%, rgba(226,185,157,0.12), transparent 40%),
-    #3D2412;
+    radial-gradient(120% 120% at 80% 0%, rgba(201,169,97,0.22), transparent 45%),
+    radial-gradient(120% 120% at 0% 100%, rgba(201,169,97,0.14), transparent 40%),
+    #0A0A0A;
 }
 
 /* Fine grain overlay for luxury texture */
@@ -228,19 +226,19 @@ body::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, #E2B99D, #F0DDCE 50%, #C89B7C);
+  background: linear-gradient(135deg, #E8D5A3, #C9A961 50%, #A8841B);
   transform: translateY(101%);
   transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 0;
 }
 .btn-luxe:hover::before { transform: translateY(0); }
-.btn-luxe:hover { color: var(--ink); }
+.btn-luxe:hover { color: #0A0A0A; }
 .btn-luxe > * { position: relative; z-index: 1; }
 
 /* Custom selection highlight */
 ::selection {
   background-color: var(--gold);
-  color: #3D2412;
+  color: #0A0A0A;
 }
 
 /* ─── Gold shine sweep (subtle, kept) ─── */
@@ -289,6 +287,7 @@ body::before {
 .animate-marquee {
   animation: none !important;
 }
+
 
 /* Scroll progress bar → thin gold */
 .scroll-progress {

@@ -246,12 +246,12 @@ export function countActiveFilters(f: ProductFilters, facets: Facets): number {
 /*  to). Keeps every card/quick-view consistent.                     */
 /* ═══════════════════════════════════════════════════════════════ */
 
-export function addToCart(product: Product, size = "Standard", quantity = 1) {
+export function addToCart(product: Product, quantity = 1) {
   if (typeof window === "undefined") return;
   useCartStore.getState().addItem({
     id: product.id,
     name: product.name,
-    size,
+    size: "Standard",
     price: parsePrice(product.price),
     quantity,
     image: product.image,

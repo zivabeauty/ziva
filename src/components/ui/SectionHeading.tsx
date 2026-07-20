@@ -40,11 +40,11 @@ export default function SectionHeading({
       {(eyebrow || index) && (
         <span className={`mb-5 flex items-center gap-3 ${centered ? "justify-center" : ""}`}>
           {index && (
-            <span className={`font-serif text-base italic ${accent}`}>{index}</span>
+            <span className={`text-base font-semibold ${accent}`}>{index}</span>
           )}
           <span className={`h-px w-8 bg-gradient-to-r ${rule} to-transparent`} />
           {eyebrow && (
-            <span className={`text-[0.66rem] font-semibold uppercase tracking-[0.32em] ${accent}`}>
+            <span className={`text-[0.86rem] font-semibold uppercase tracking-[0.32em] ${accent}`}>
               {eyebrow}
             </span>
           )}
@@ -52,7 +52,7 @@ export default function SectionHeading({
       )}
 
       <h2
-        className={`display-xl text-4xl sm:text-5xl lg:text-6xl ${dark ? "on-dark text-cream" : "text-ink"}`}
+        className={`text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl ${dark ? "on-dark text-cream" : "text-ink"}`}
       >
         {title}
       </h2>

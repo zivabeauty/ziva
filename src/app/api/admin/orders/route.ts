@@ -31,9 +31,16 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "order_id is required." }, { status: 400 });
   }
 
+  const ALLOWED_STATUSES = ["pending", "paid", "dispatched", "delivered", "cancelled"];
   const updates: Record<string, string> = {};
-  if (typeof body.payment_status === "string") updates.payment_status = body.payment_status;
-  if (typeof body.tracking_id === "string") updates.tracking_id = body.tracking_id;
+  if (typeof body.payment_status === "string") {
+    const status = body.payment_status.toLowerCase().trim();
+    if (!ALLOWED_STATUSES.includes(status)) {
+      return NextResponse.json({ error: "Invalid payment status." }, { status: 400 });
+    }
+    updates.payment_status = status;
+  }
+  if (typeof body.tracking_id === "string") updates.tracking_id = body.tracking_id.trim().slice(0, 100);
   if (Object.keys(updates).length === 0) {
     return NextResponse.json({ error: "Nothing to update." }, { status: 400 });
   }

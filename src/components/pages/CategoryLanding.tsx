@@ -68,6 +68,35 @@ export default function CategoryLanding({ config }: CategoryLandingProps) {
         </div>
       </header>
 
+
+      <section id="products" className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+        <SectionHeading
+          eyebrow="Shop The Collection"
+          title={
+            <>
+              {config.category} <span className="candy-gradient-text">Products</span>
+            </>
+          }
+          subtitle={`${categoryProducts.length} formula${categoryProducts.length === 1 ? "" : "s"} in this collection.`}
+          className="mb-12"
+        />
+        <ProductGrid
+          products={categoryProducts}
+          wishlistIds={wishlistIds}
+          onToggleWishlist={toggleWishlist}
+          onQuickView={setQuickView}
+          className="grid grid-cols-2 gap-x-5 gap-y-8 md:grid-cols-3 lg:grid-cols-4"
+        />
+        {categoryProducts.length === 0 && (
+          <p className="text-center text-sm text-stone-500">
+            New arrivals coming soon.{" "}
+            <Link href="/products" className="font-bold text-gold-deep hover:underline">
+              Browse all products
+            </Link>
+          </p>
+        )}
+      </section>
+
       {/* Editorial */}
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-12">
@@ -127,33 +156,7 @@ export default function CategoryLanding({ config }: CategoryLandingProps) {
       </section>
 
       {/* Products */}
-      <section id="products" className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-        <SectionHeading
-          eyebrow="Shop The Collection"
-          title={
-            <>
-              {config.category} <span className="candy-gradient-text">Products</span>
-            </>
-          }
-          subtitle={`${categoryProducts.length} formula${categoryProducts.length === 1 ? "" : "s"} in this collection.`}
-          className="mb-12"
-        />
-        <ProductGrid
-          products={categoryProducts}
-          wishlistIds={wishlistIds}
-          onToggleWishlist={toggleWishlist}
-          onQuickView={setQuickView}
-          className="grid grid-cols-2 gap-x-5 gap-y-8 md:grid-cols-3 lg:grid-cols-4"
-        />
-        {categoryProducts.length === 0 && (
-          <p className="text-center text-sm text-stone-500">
-            New arrivals coming soon.{" "}
-            <Link href="/products" className="font-bold text-gold-deep hover:underline">
-              Browse all products
-            </Link>
-          </p>
-        )}
-      </section>
+    
 
       {/* CTA */}
       <section className="mx-auto max-w-7xl px-4 pb-24 sm:px-6 lg:px-8">

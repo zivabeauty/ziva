@@ -38,3 +38,28 @@ export function recordFailure(key: string): void {
 export function clearFailures(key: string): void {
   buckets.delete(key);
 }
+
+/* ── Generic per-IP request throttle (for public write endpoints) ── */
+
+const reqBuckets = new Map<string, Bucket>();
+
+/**
+ * Sliding-window throttle: allows `max` requests per `windowMs` per key.
+ * Returns true when the request should be REJECTED. In-memory — good enough
+ * per instance; swap for a shared store when scaling horizontally.
+ */
+export function throttleRequest(key: string, max = 10, windowMs = 60_000): boolean {
+  const now = Date.now();
+  const bucket = reqBuckets.get(key);
+  if (!bucket || now > bucket.resetAt) {
+    reqBuckets.set(key, { count: 1, resetAt: now + windowMs });
+    return false;
+  }
+  bucket.count++;
+  return bucket.count > max;
+}
+
+/** Extracts the caller IP behind proxies (first x-forwarded-for entry). */
+export function clientIp(request: Request): string {
+  return request.headers.get("x-forwarded-for")?.split(",")[0].trim() || "unknown";
+}

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import Razorpay from "razorpay";
 import { priceCart } from "@/lib/server/checkout";
+import { throttleRequest, clientIp } from "@/lib/server/rate-limit";
 
 function hasRealKeys(keyId?: string, keySecret?: string): boolean {
   return Boolean(
@@ -17,6 +18,13 @@ function hasRealKeys(keyId?: string, keySecret?: string): boolean {
  */
 export async function POST(request: Request) {
   try {
+    if (throttleRequest(`razorpay:${clientIp(request)}`, 15, 60_000)) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again in a minute." },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json().catch(() => ({}));
     const priced = await priceCart(body.items, body.promoCode);
     if ("error" in priced) {

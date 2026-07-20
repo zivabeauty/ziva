@@ -3,27 +3,22 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { 
-  Star, 
-  Heart, 
-  ShoppingBag, 
-  ChevronRight, 
-  Plus, 
-  Minus, 
-  ShieldCheck, 
-  Leaf, 
-  Truck,
+import {
+  Star,
+  Heart,
+  ShoppingBag,
+  ChevronRight,
+  Plus,
+  Minus,
   ArrowLeft,
   Share2,
   ChevronDown,
-  Info
 } from "lucide-react";
 import Tilt from "@/components/Tilt";
-import Magnetic from "@/components/Magnetic";
-import { products as staticProducts, type Product } from "@/data/beautyData";
+import { products as staticProducts } from "@/data/beautyData";
 import { useProduct, useProducts } from "@/features/products/hooks/useProducts";
 import { useWishlist } from "@/features/wishlist/hooks/useWishlist";
-import { addToCart } from "@/lib/product-utils";
+import { addToCart, inStock } from "@/lib/product-utils";
 
 export default function ProductPage() {
   const params = useParams();
@@ -35,37 +30,34 @@ export default function ProductPage() {
   const product = fetchedProduct ?? productList.find((p) => p.id === productId) ?? staticProducts[0];
   const { isWishlisted, toggleWishlist } = useWishlist();
 
-  const [selectedSize, setSelectedSize] = useState("50 ml");
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(product.image);
-  
+
   // Custom Magnifier Zoom
   const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 });
   const [zoomed, setZoomed] = useState(false);
-  
+
   // Fullscreen Lightbox
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
   // Accordion Expanders
   const [expandedSection, setExpandedSection] = useState<string | null>("description");
 
-  // Dynamic details mapper based on sizes
-  const basePriceNum = parseFloat(product.price.replace(/[^0-9.]/g, "")) || 499.00;
-  const sizeDetails: Record<string, { price: string; priceVal: number; stock: number; sku: string }> = {
-    "30 ml": { price: `₹${Math.round(basePriceNum).toLocaleString('en-IN')}`, priceVal: basePriceNum, stock: 15, sku: `ZIV-${product.id}-30` },
-    "50 ml": { price: `₹${Math.round(basePriceNum * 1.4).toLocaleString('en-IN')}`, priceVal: basePriceNum * 1.4, stock: 32, sku: `ZIV-${product.id}-50` },
-    "100 ml": { price: `₹${Math.round(basePriceNum * 2.2).toLocaleString('en-IN')}`, priceVal: basePriceNum * 2.2, stock: 8, sku: `ZIV-${product.id}-100` },
-    "200 ml": { price: `₹${Math.round(basePriceNum * 3.5).toLocaleString('en-IN')}`, priceVal: basePriceNum * 3.5, stock: 0, sku: `ZIV-${product.id}-200` } // Out of Stock
-  };
+  const available = inStock(product);
 
-  const currentDetail = sizeDetails[selectedSize] || sizeDetails["50 ml"];
+  // All display images: main + hover + admin gallery, de-duped and non-empty.
+  const productImages = [product.image, product.hoverImage, ...(product.gallery ?? [])]
+    .filter((img): img is string => Boolean(img))
+    .filter((img, i, arr) => arr.indexOf(img) === i);
 
-  // Sync state if product changes
-  useEffect(() => {
-    setSelectedSize("50 ml");
+  // Sync state when a different product renders — adjust-during-render
+  // pattern (avoids a cascading effect re-render).
+  const [prevProductId, setPrevProductId] = useState(product.id);
+  if (product.id !== prevProductId) {
+    setPrevProductId(product.id);
     setActiveImage(product.image);
     setQuantity(1);
-  }, [product]);
+  }
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
@@ -75,12 +67,8 @@ export default function ProductPage() {
   };
 
   const handleAddToCart = () => {
-    if (currentDetail.stock === 0) return;
-    addToCart(
-      { ...product, price: currentDetail.price },
-      selectedSize,
-      quantity
-    );
+    if (!available) return;
+    addToCart(product, quantity);
   };
 
   const handleWishlist = () => toggleWishlist(product);
@@ -122,7 +110,7 @@ export default function ProductPage() {
           
           {/* Vertical thumbnail list */}
           <div className="flex flex-row md:flex-col gap-4 w-full md:w-24 overflow-x-auto md:overflow-x-visible">
-            {[product.image, product.hoverImage, "https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=300&auto=format&fit=crop"].map((img, idx) => (
+            {productImages.map((img, idx) => (
               <button
                 key={idx}
                 onClick={() => setActiveImage(img)}
@@ -165,7 +153,7 @@ export default function ProductPage() {
 
         </div>
 
-        {/* Right Side: details & size selector & accordions */}
+        {/* Right Side: details & accordions */}
         <div className="lg:col-span-5 flex flex-col justify-between">
           <div className="flex flex-col gap-6">
             
@@ -185,10 +173,10 @@ export default function ProductPage() {
               </div>
             </div>
 
-            {/* Price with Volume detail info */}
+            {/* Price & availability */}
             <div className="flex flex-col gap-1 border-y border-stone-150 py-4">
               <div className="flex items-center gap-4 text-2xl font-serif">
-                <span className="font-semibold text-black">{currentDetail.price}</span>
+                <span className="font-semibold text-black">{product.price}</span>
                 {product.oldPrice && (
                   <span className="text-sm text-stone-400 line-through font-light">{product.oldPrice}</span>
                 )}
@@ -197,41 +185,20 @@ export default function ProductPage() {
                 </span>
               </div>
               <div className="flex justify-between text-[10px] text-stone-400 font-light tracking-wide mt-1">
-                <span>SKU: <strong className="font-medium text-stone-700">{currentDetail.sku}</strong></span>
-                <span>Availability: {currentDetail.stock > 0 ? (
-                  <strong className="text-emerald-600 font-medium">In Stock ({currentDetail.stock} left)</strong>
-                ) : (
-                  <strong className="text-rose-600 font-medium">Out of Stock</strong>
-                )}</span>
+                <span>
+                  Availability:{" "}
+                  {available ? (
+                    <strong className="text-emerald-600 font-medium">In Stock</strong>
+                  ) : (
+                    <strong className="text-rose-600 font-medium">Out of Stock</strong>
+                  )}
+                </span>
               </div>
             </div>
 
             <p className="text-stone-500 text-xs sm:text-sm font-light leading-relaxed">
               {product.description}
             </p>
-
-            {/* Size Selector pills */}
-            <div>
-              <span className="text-[9px] uppercase tracking-[0.2em] text-stone-400 font-bold block mb-3">Select Volume</span>
-              <div className="flex flex-wrap gap-3">
-                {["30 ml", "50 ml", "100 ml", "200 ml"].map((size) => (
-                  <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    className={`relative px-5 py-3 border text-[10px] tracking-widest uppercase font-semibold transition-all rounded-full ${
-                      selectedSize === size 
-                        ? "border-[#C9A961] bg-[#FAF8F5] text-black shadow-[0_0_12px_rgba(201,162,39,0.15)]" 
-                        : "border-stone-200 bg-transparent text-stone-600 hover:border-black"
-                    }`}
-                  >
-                    {size}
-                    {size === "200 ml" && (
-                      <span className="absolute -top-1.5 -right-1 px-1.5 py-0.5 bg-rose-100 text-rose-600 text-[6px] font-bold uppercase rounded-full">Sold Out</span>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
 
             {/* Quantity selection */}
             <div>
@@ -257,9 +224,9 @@ export default function ProductPage() {
             <div className="flex gap-4 pt-6 mt-2 border-t border-stone-100">
               <button
                 onClick={handleAddToCart}
-                disabled={currentDetail.stock === 0}
+                disabled={!available}
                 className={`flex-grow py-4 text-[10px] font-bold uppercase tracking-[0.25em] transition-all rounded-full flex items-center justify-center gap-2 group/btn ${
-                  currentDetail.stock > 0 
+                  available 
                     ? "bg-[#C9A961] text-black hover:bg-black hover:text-white shadow-[0_8px_25px_rgba(201,162,39,0.15)]" 
                     : "bg-stone-150 text-stone-400 cursor-not-allowed border border-stone-200"
                 }`}
@@ -385,13 +352,13 @@ export default function ProductPage() {
       <div className="fixed bottom-0 left-0 right-0 z-30 bg-white/90 backdrop-blur-xl border-t border-stone-200 py-3.5 px-4 flex sm:hidden items-center justify-between shadow-lg">
         <div className="flex flex-col">
           <span className="text-[8px] uppercase tracking-widest text-stone-400">Total Price</span>
-          <span className="text-sm font-bold text-black">{currentDetail.price}</span>
+          <span className="text-sm font-bold text-black">{product.price}</span>
         </div>
         <button 
           onClick={handleAddToCart}
-          disabled={currentDetail.stock === 0}
+          disabled={!available}
           className={`px-6 py-2.5 text-[9px] font-bold uppercase tracking-widest rounded-full ${
-            currentDetail.stock > 0 ? "bg-[#C9A961] text-black" : "bg-stone-200 text-stone-450 cursor-not-allowed"
+            available ? "bg-[#C9A961] text-black" : "bg-stone-200 text-stone-450 cursor-not-allowed"
           }`}
         >
           Add To Bag

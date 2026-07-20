@@ -110,6 +110,7 @@ function buildReceiptHtml(order: OrderRecord) {
   .brand { text-align: center; padding-bottom: 14px; border-bottom: 2px solid #3D2412; }
   .brand h1 { margin: 0; font-size: 26px; letter-spacing: 6px; color: #3D2412; font-weight: 800; }
   .brand p { margin: 4px 0 0; font-size: 8px; letter-spacing: 2.5px; text-transform: uppercase; color: #79443B; }
+  .brand .gstin { margin-top: 8px; font-size: 10px; letter-spacing: 1px; text-transform: none; color: #2a211d; font-weight: 600; }
   .tag { text-align: center; margin: 12px 0 16px; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #79443B; font-weight: 700; }
   .meta { font-size: 11px; line-height: 1.7; }
   .meta .row { display: flex; justify-content: space-between; gap: 12px; }
@@ -139,8 +140,9 @@ function buildReceiptHtml(order: OrderRecord) {
 <body>
   <div class="receipt">
     <div class="brand">
-      <h1>ZIVA</h1>
+      <h1>ZivaBeauty</h1>
       <p>Luxury Beauty · Skincare · Makeup</p>
+      <p class="gstin">GSTIN: 07ABXPW9068N2Z4</p>
     </div>
     <div class="tag">Payment Receipt</div>
 
@@ -388,6 +390,7 @@ const EMPTY_FORM = {
   sizes: "30 ml, 50 ml, 100 ml",
   ingredients: "",
   usage: "",
+  gallery: [] as string[],
 };
 
 export default function AdminPage() {
@@ -481,6 +484,9 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
+      // Data fetch on auth — loading flags set inside are intentional
+      // external-system synchronization, not derived state.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchOrders();
       fetchProducts();
     }
@@ -572,6 +578,7 @@ export default function AdminPage() {
       sizes: Array.isArray(prod.sizes) ? prod.sizes.join(", ") : "50 ml",
       ingredients: prod.ingredients || "",
       usage: prod.usage || "",
+      gallery: Array.isArray(prod.gallery) ? prod.gallery.filter(Boolean) : [],
     });
     setIsProductModalOpen(true);
   };
@@ -584,6 +591,15 @@ export default function AdminPage() {
     setIsProductModalOpen(true);
   };
 
+  /** Set one gallery slot by index (keeps the array length stable for the UI). */
+  const setGalleryImage = (index: number, url: string) => {
+    setProductForm((f) => {
+      const gallery = [...f.gallery];
+      gallery[index] = url;
+      return { ...f, gallery };
+    });
+  };
+
   const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     setSavingProduct(true);
@@ -593,6 +609,7 @@ export default function AdminPage() {
       id: parseInt(productForm.id),
       rating: Number(productForm.rating),
       sizes: productForm.sizes.split(",").map((s) => s.trim()).filter(Boolean),
+      gallery: productForm.gallery.filter(Boolean),
     };
 
     try {
@@ -1277,6 +1294,24 @@ export default function AdminPage() {
                 onChange={(url) => setProductForm((f) => ({ ...f, hoverImage: url }))}
                 onError={(m) => setProductFormError(m)}
               />
+            </div>
+
+            {/* Gallery images — extra photos shown in the product page thumbnails */}
+            <div>
+              <label className="block text-[9px] uppercase tracking-[0.18em] text-stone-500 font-bold mb-2">
+                Gallery images (optional · up to 4)
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {[0, 1, 2, 3].map((i) => (
+                  <ImageUploadField
+                    key={i}
+                    label={`Image ${i + 1}`}
+                    value={productForm.gallery[i] || ""}
+                    onChange={(url) => setGalleryImage(i, url)}
+                    onError={(m) => setProductFormError(m)}
+                  />
+                ))}
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">

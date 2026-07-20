@@ -1,6 +1,14 @@
+import { createHash, timingSafeEqual } from "crypto";
 import { NextResponse } from "next/server";
 import { isRateLimited, recordFailure, clearFailures } from "@/lib/server/rate-limit";
 import { ADMIN_COOKIE, createSessionToken } from "@/lib/server/session";
+
+/** Constant-time password comparison (hash first so lengths always match). */
+function passwordsMatch(supplied: string, expected: string): boolean {
+  const a = createHash("sha256").update(supplied).digest();
+  const b = createHash("sha256").update(expected).digest();
+  return timingSafeEqual(a, b);
+}
 
 export async function POST(request: Request) {
   // Identify the caller. Behind Vercel/proxies the real IP is the first
@@ -31,7 +39,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
 
-  if (typeof password !== "string" || password !== adminPassword) {
+  if (typeof password !== "string" || !passwordsMatch(password, adminPassword)) {
     recordFailure(ip); // Count this failure toward the lockout.
     // Small delay to blunt brute-force attempts.
     await new Promise((r) => setTimeout(r, 750));

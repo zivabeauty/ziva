@@ -14,6 +14,8 @@ function sanitizeProduct(body: Record<string, unknown>) {
   if (!name) return { error: "Name is required." };
   if (!price) return { error: "Price is required." };
 
+  const gallery = Array.isArray(body.gallery) ? body.gallery.map(String).filter(Boolean) : [];
+
   return {
     product: {
       id,
@@ -29,6 +31,9 @@ function sanitizeProduct(body: Record<string, unknown>) {
       sizes: Array.isArray(body.sizes) ? body.sizes.map(String) : [],
       ingredients: body.ingredients ? String(body.ingredients) : null,
       usage: body.usage ? String(body.usage) : null,
+      // Only sent when populated, so product saves keep working even before the
+      // `gallery` column migration has been applied to the database.
+      ...(gallery.length ? { gallery } : {}),
     },
   };
 }

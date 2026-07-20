@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, Phone, MapPin, Clock, Send, CheckCircle2 } from "lucide-react";
+import { Send, CheckCircle2 } from "lucide-react";
 import { contactContent } from "@/data/pageContent";
 import SectionHeading from "@/components/ui/SectionHeading";
 
 export default function ContactPage() {
-  const { eyebrow, title, titleAccent, intro, email, phone, address, hours, faqs } = contactContent;
+  const { eyebrow, title, titleAccent, intro, faqs } = contactContent;
 
   const [form, setForm] = useState({ name: "", email: "", phone: "", subject: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
@@ -31,7 +31,7 @@ export default function ContactPage() {
     <div className="min-h-screen bg-background font-sans text-ink">
       {/* Hero */}
       <header className="border-b border-stone-150 bg-porcelain/60">
-        <div className="mx-auto max-w-7xl px-4 py-14 text-center sm:px-6 lg:px-8 lg:py-16">
+        <div className="mx-auto max-w-8xl px-4 py-14 text-center sm:px-6 lg:px-8 lg:py-16">
           <span className="eyebrow eyebrow-center mb-4">{eyebrow}</span>
           <h1 className="display-xl text-4xl text-ink sm:text-6xl">
             {title}{" "}
@@ -43,11 +43,10 @@ export default function ContactPage() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-16 lg:grid-cols-12">
-          {/* Contact form */}
-          <div className="lg:col-span-7">
-            <h2 className="mb-6 font-serif text-2xl font-bold text-ink">Send Us a Message</h2>
+      <div className="mx-auto max-w-8xl px-4 py-16 sm:px-6 lg:px-8">
+        {/* Contact form — centered */}
+        <div className="mx-auto w-full max-w-xl">
+          <h2 className="mb-6 text-center font-serif text-2xl font-bold text-ink">Send Us a Message</h2>
 
             {submitted ? (
               <div className="flex flex-col items-center gap-4 rounded-[28px] border border-emerald-200 bg-emerald-50/50 px-8 py-12 text-center">
@@ -119,7 +118,6 @@ export default function ContactPage() {
                       className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3.5 text-sm text-ink focus:border-gold focus:outline-none"
                       placeholder="Subject"
                     />
-                  
                   </div>
                 </div>
                 <div>
@@ -138,69 +136,13 @@ export default function ContactPage() {
                 {error && <p className="text-center text-xs font-medium text-red-500">{error}</p>}
                 <button
                   type="submit"
-                  className="btn-luxe w-full justify-center sm:w-auto"
+                  className="btn-luxe w-full justify-center"
                 >
                   <span>Send Message</span>
                   <Send className="h-4 w-4" />
                 </button>
               </form>
             )}
-          </div>
-
-          {/* Contact info */}
-          <div className="lg:col-span-5">
-            <div className="card-luxe rounded-[4px] p-8">
-              <h2 className="mb-8 font-serif text-xl font-bold text-ink">Concierge Details</h2>
-              <ul className="flex flex-col gap-6">
-                <li className="flex items-start gap-4">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-porcelain text-gold">
-                    <Mail className="h-4 w-4" />
-                  </span>
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400">Email</p>
-                    <a href={`mailto:${email}`} className="text-sm font-semibold text-ink hover:text-gold-deep">
-                      {email}
-                    </a>
-                  </div>
-                </li>
-                <li className="flex items-start gap-4">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-porcelain text-gold">
-                    <Phone className="h-4 w-4" />
-                  </span>
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400">Phone</p>
-                    <a href={`tel:${phone.replace(/\s/g, "")}`} className="text-sm font-semibold text-ink hover:text-gold-deep">
-                      {phone}
-                    </a>
-                  </div>
-                </li>
-                <li className="flex items-start gap-4">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-porcelain text-gold">
-                    <MapPin className="h-4 w-4" />
-                  </span>
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400">Studio</p>
-                    <p className="whitespace-pre-line text-sm font-medium leading-relaxed text-ink/70">{address}</p>
-                  </div>
-                </li>
-                <li className="flex items-start gap-4">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-porcelain text-gold">
-                    <Clock className="h-4 w-4" />
-                  </span>
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400">Hours</p>
-                    <ul className="mt-1 flex flex-col gap-1">
-                      {hours.map((h) => (
-                        <li key={h.day} className="text-xs font-medium text-ink/70">
-                          <span className="font-bold text-ink">{h.day}:</span> {h.time}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </div>
         </div>
 
         {/* FAQs */}

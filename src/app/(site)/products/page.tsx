@@ -39,11 +39,14 @@ export default function ProductsPage() {
   const priceTouched = useRef(false);
   const prevBounds = useRef<[number, number]>([facets.priceMin, facets.priceMax]);
 
-  // Apply ?category= / ?q= from the URL once on mount.
+  // Apply ?category= / ?q= from the URL once on mount. Reading
+  // window.location is an external-system sync, which must happen
+  // post-hydration — the setState here is intentional.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const cat = params.get("category");
     const q = params.get("q");
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setFilters((f) => {
       const next = { ...f };
       if (cat && cat.toLowerCase() !== "all") {

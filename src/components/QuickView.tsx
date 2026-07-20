@@ -16,22 +16,22 @@ interface QuickViewProps {
   onToggleWishlist?: (product: Product) => void;
 }
 
-/** Lightweight product preview modal with size, quantity and add-to-bag. */
+/** Lightweight product preview modal with quantity and add-to-bag. */
 export default function QuickView({
   product,
   onClose,
   isWishlisted = false,
   onToggleWishlist,
 }: QuickViewProps) {
-  const [size, setSize] = useState("");
   const [qty, setQty] = useState(1);
 
-  useEffect(() => {
-    if (product) {
-      setSize(product.sizes?.[0] || "Standard");
-      setQty(1);
-    }
-  }, [product]);
+  // Reset quantity when a different product opens — the React-sanctioned
+  // "adjust state during render" pattern (no cascading effect render).
+  const [prevProduct, setPrevProduct] = useState(product);
+  if (product !== prevProduct) {
+    setPrevProduct(product);
+    setQty(1);
+  }
 
   // Close on Escape
   useEffect(() => {
@@ -93,29 +93,6 @@ export default function QuickView({
                 {product.description}
               </p>
 
-              {product.sizes && product.sizes.length > 0 && (
-                <div className="mt-5">
-                  <span className="mb-2 block text-[9px] font-bold uppercase tracking-[0.2em] text-stone-400">
-                    Size
-                  </span>
-                  <div className="flex flex-wrap gap-2">
-                    {product.sizes.map((s) => (
-                      <button
-                        key={s}
-                        onClick={() => setSize(s)}
-                        className={`px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all ${
-                          size === s
-                            ? "bg-ink text-cream"
-                            : "bg-stone-100 text-stone-500 hover:bg-stone-200"
-                        }`}
-                      >
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
               <div className="mt-5 flex items-center gap-4">
                 <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-stone-400">
                   Qty
@@ -143,7 +120,7 @@ export default function QuickView({
                 <button
                   onClick={() => {
                     if (!available) return;
-                    addToCart(product, size, qty);
+                    addToCart(product, qty);
                     onClose();
                   }}
                   disabled={!available}
@@ -163,6 +140,7 @@ export default function QuickView({
 
               <Link
                 href={`/product/${product.id}`}
+                onClick={onClose}
                 className="mt-4 inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-ink/60 transition-colors hover:text-gold-deep"
               >
                 View Full Details <ArrowRight className="h-3 w-3" />

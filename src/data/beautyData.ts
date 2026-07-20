@@ -29,6 +29,8 @@ export interface Product {
 export interface HeroSlide {
   id: number;
   image: string;
+  /** Optional portrait banner shown on mobile instead of `image`. */
+  mobileImage?: string;
   tagline: string;
   title: string;
   titleAccent: string;
@@ -63,10 +65,14 @@ export interface Ingredient {
 export interface Testimonial {
   id: number;
   quote: string;
+  title: string;
   author: string;
   role: string;
   avatar: string;
   rating: number;
+  productName: string;
+  productImage: string;
+  productHref: string;
 }
 
 /* ═══════════════════════════════════════════════ */
@@ -76,13 +82,13 @@ export interface Testimonial {
 export const heroSlides: HeroSlide[] = [
   {
     id: 1,
-    image: "/homeHero_banner.png",
+    image: "/ziva5.png",
+    mobileImage: "/home_hero_mobile.png",
     tagline: "New Arrival",
     title: "Glow",
     titleAccent: "That Lasts",
     description: "Nourish. Repair. Radiate. Beauty that stays with you — featuring our Keratin Mask."
   },
-  
 ];
 
 /* ═══════════════════════════════════════════════ */
@@ -405,38 +411,6 @@ export const hairCareCategories: string[] = [
   "Deep Conditioning"
 ];
 
-/* ═══════════════════════════════════════════════ */
-/*               MEN'S PRODUCTS                    */
-/* ═══════════════════════════════════════════════ */
-
-export const mensProducts: Product[] = [
-  {
-    id: 15,
-    name: "Ziva Men's D-Tan Pack",
-    category: "Men's Grooming",
-    desc: "Advanced de-tanning formula for men's stubborn tan and sun damage.",
-    description: "Advanced de-tanning formula for men's stubborn tan and sun damage.",
-    price: "₹499",
-    rating: 5,
-    sizes: ["100g"],
-    badge: "Homme",
-    image: "/D-Tan Pack/thumbnail.png",
-    hoverImage: "/D-Tan Pack/3.png"
-  },
-  {
-    id: 16,
-    name: "Ziva Men's Diamond Scrub",
-    category: "Men's Grooming",
-    desc: "Deep-cleansing diamond scrub for rough, tired skin.",
-    description: "Deep-cleansing diamond scrub for rough, tired skin.",
-    price: "₹699",
-    rating: 5,
-    sizes: ["100g"],
-    badge: "Homme",
-    image: "/Diamond Facial Scrub/thumbnail.png",
-    hoverImage: "/Diamond Facial Scrub/4.png"
-  }
-];
 
 /* ═══════════════════════════════════════════════ */
 /*                 TESTIMONIALS                    */
@@ -445,36 +419,56 @@ export const mensProducts: Product[] = [
 export const testimonials: Testimonial[] = [
   {
     id: 1,
-    quote: "The Korean Glass Glow Facial Kit gave me the most incredible glow! My skin looked like porcelain after just one use. Absolutely love Ziva products!",
+    title: "Just Love It!",
+    quote:
+      "The Korean Glass Glow Facial Kit gave me the most incredible glow! My skin looked luminous after just one use. Absolutely love Ziva products!",
     author: "Priya Sharma",
     role: "Verified Buyer",
     avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100&auto=format&fit=crop",
-    rating: 5
+    rating: 5,
+    productName: "Korean Glass Glow Facial Kit",
+    productImage: "/Korean Glass glow Facial kit/thumbnail.png",
+    productHref: "/product/1",
   },
   {
     id: 2,
-    quote: "I used the Bridal Bright Facial Kit before my wedding and my skin was glowing! My makeup artist couldn't stop complimenting my skin. Best investment ever.",
+    title: "Wedding-Ready Glow",
+    quote:
+      "I used the Bridal Bright Facial Kit before my wedding and my skin was glowing! My makeup artist couldn't stop complimenting my skin.",
     author: "Ananya Gupta",
-    role: "Bride-to-be",
+    role: "Verified Buyer",
     avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=100&auto=format&fit=crop",
-    rating: 5
+    rating: 5,
+    productName: "Bridal Bright Facial Kit",
+    productImage: "/Bridal bright facial kit/thumbnail.png",
+    productHref: "/product/2",
   },
   {
     id: 3,
-    quote: "The Keratin Shampoo and Mask duo completely transformed my damaged hair. It's now silky smooth and frizz-free. The results are salon-quality at home!",
+    title: "Silky Soft Hair",
+    quote:
+      "The Keratin Shampoo and Mask duo completely transformed my damaged hair. It's now silky smooth and frizz-free — salon-quality at home!",
     author: "Meera Patel",
-    role: "Regular Customer",
+    role: "Verified Buyer",
     avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=100&auto=format&fit=crop",
-    rating: 5
+    rating: 5,
+    productName: "Keratin Hair Mask",
+    productImage: "/keratin_mask.png",
+    productHref: "/product/13",
   },
   {
     id: 4,
-    quote: "The Magic Grip Primer is a game-changer! My foundation stays put for 14+ hours without touchups. This is now a permanent part of my daily routine.",
+    title: "Stays All Day",
+    quote:
+      "The Magic Grip Primer is a game-changer! My foundation stays put for hours without touchups. Now a permanent part of my daily routine.",
     author: "Riya Khanna",
-    role: "Makeup Enthusiast",
+    role: "Verified Buyer",
     avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=100&auto=format&fit=crop",
-    rating: 5
-  }
+    rating: 5,
+    productName: "Magic Grip Primer",
+    productImage: "/magic_primer.png",
+    productHref: "/product/7",
+  },
 ];
 
 /* ═══════════════════════════════════════════════ */

@@ -2,7 +2,8 @@ import { createHmac, timingSafeEqual } from "crypto";
 import { NextResponse } from "next/server";
 import { priceCart } from "@/lib/server/checkout";
 import { supabaseAdmin } from "@/lib/server/supabase-admin";
-import { sendOrderConfirmationSms } from "@/lib/server/notifications";
+import { sendOrderConfirmationSms, sendOrderConfirmationEmail } from "@/lib/server/notifications";
+import { throttleRequest, clientIp } from "@/lib/server/rate-limit";
 
 interface PaymentProof {
   razorpay_order_id?: string;
@@ -32,6 +33,13 @@ function verifySignature(payment: PaymentProof, secret: string): boolean {
  */
 export async function POST(request: Request) {
   try {
+    if (throttleRequest(`orders:${clientIp(request)}`, 10, 60_000)) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again in a minute." },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json().catch(() => ({}));
     const payment: PaymentProof = body.payment ?? {};
     const shipping: Record<string, string> = body.shipping ?? {};
@@ -94,6 +102,17 @@ export async function POST(request: Request) {
     });
 
     if (!res.ok) {
+      // 409 = this order_id already exists (double-submit / replay of an
+      // already-verified payment). Treat as idempotent success — the order
+      // is recorded; don't alarm the customer or send duplicate notifications.
+      if (res.status === 409) {
+        return NextResponse.json({
+          ok: true,
+          orderId: order.order_id,
+          amount: priced.totals.total,
+          duplicate: true,
+        });
+      }
       console.error("Order insert failed:", await res.text());
       return NextResponse.json(
         { error: "Payment received but the order could not be saved. Please contact support with your payment id." },
@@ -107,6 +126,20 @@ export async function POST(request: Request) {
       amount: priced.totals.total,
       customerName: order.name,
     }).catch((err) => console.error("SMS notification failed:", err));
+
+    sendOrderConfirmationEmail({
+      email: order.email,
+      customerName: order.name,
+      orderId: order.order_id!,
+      amount: priced.totals.total,
+      address: `${order.address}, ${order.city}, ${order.state} — ${order.pincode}`,
+      items: priced.items.map((i) => ({
+        name: i.product.name,
+        qty: i.quantity,
+        size: i.size,
+        price: i.unitPrice,
+      })),
+    }).catch((err) => console.error("Email notification failed:", err));
 
     return NextResponse.json({
       ok: true,

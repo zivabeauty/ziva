@@ -15,8 +15,6 @@ import {
   Sparkles,
   ArrowRight,
   Truck,
-  ChevronLeft,
-  ChevronRight
 } from "lucide-react";
 import Magnetic from "./Magnetic";
 import type { OrderRecord, WishlistItem } from "@/lib/cart-types";
@@ -24,29 +22,10 @@ import { parsePrice, PROMO_CODES } from "@/lib/pricing";
 import { useCart } from "@/features/cart/hooks/useCart";
 import { useWishlist } from "@/features/wishlist/hooks/useWishlist";
 import { useUiStore } from "@/store/ui.store";
-import { checkoutService } from "@/features/checkout/services/checkout.service";
+import { useCheckout } from "@/features/checkout/hooks/useCheckout";
 import { useTrackOrderMutation } from "@/features/orders/hooks/useTrackOrder";
 import { ApiError } from "@/types/api";
 import Image from "next/image";
-
-const loadRazorpayScript = () => {
-  return new Promise((resolve) => {
-    if (typeof window === "undefined") {
-      resolve(false);
-      return;
-    }
-    if ((window as any).Razorpay) {
-      resolve(true);
-      return;
-    }
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.async = true;
-    script.onload = () => resolve(true);
-    script.onerror = () => resolve(false);
-    document.body.appendChild(script);
-  });
-};
 
 export default function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -64,12 +43,12 @@ export default function Navbar() {
     addItem,
     updateQuantity,
     removeItem,
-    clearCart,
     setPromoCode,
     clearPromoCode,
   } = useCart();
   const { items: wishlistItems, remove: removeWishlist } = useWishlist();
   const trackOrderMutation = useTrackOrderMutation();
+  const checkout = useCheckout();
   
   const [searchQuery, setSearchQuery] = useState("");
   const [scrolled, setScrolled] = useState(false);
@@ -103,167 +82,9 @@ export default function Navbar() {
     }
   };
 
-  // Promo Code
+  
   const [promoCode, setPromoCodeInput] = useState("");
   const [promoError, setPromoError] = useState("");
-
-  const [visible, setVisible] = useState(true);
-
-  // Razorpay Integration States
-  const [isCheckingOut, setIsCheckingOut] = useState(false);
-  const [checkoutError, setCheckoutError] = useState("");
-  const [checkoutSuccess, setCheckoutSuccess] = useState<{ paymentId: string; orderId: string; amount: number; pending?: boolean } | null>(null);
-
-  const [checkoutStep, setCheckoutStep] = useState<"cart" | "shipping">("cart");
-  const [shippingDetails, setShippingDetails] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    address: "",
-    city: "",
-    state: "",
-    pincode: ""
-  });
-
-  const onProceedClick = () => {
-    setCheckoutError("");
-    if (checkoutStep === "cart") {
-      setCheckoutStep("shipping");
-    } else {
-      if (!shippingDetails.name || !shippingDetails.email || !shippingDetails.phone ||
-          !shippingDetails.address || !shippingDetails.city || !shippingDetails.state || !shippingDetails.pincode) {
-        setCheckoutError("Please fill in all shipping details before proceeding.");
-        return;
-      }
-      if (!/^\S+@\S+\.\S+$/.test(shippingDetails.email)) {
-        setCheckoutError("Please enter a valid email address.");
-        return;
-      }
-      handleCheckout();
-    }
-  };
-
-  
-  const recordOrder = async (payment: {
-    razorpay_order_id: string;
-    razorpay_payment_id?: string;
-    razorpay_signature?: string;
-  }) => {
-    return checkoutService.recordOrder({
-      payment,
-      shipping: shippingDetails,
-      items: cartItems.map((i) => ({ id: i.id, size: i.size, quantity: i.quantity })),
-      promoCode: appliedPromoCode,
-    });
-  };
-
-  const handleCheckout = async () => {
-    if (cartItems.length === 0) return;
-    setIsCheckingOut(true);
-    setCheckoutError("");
-
-    try {
-      // The server recomputes the amount from item ids + quantities.
-      const order = await checkoutService.createPaymentOrder(
-        cartItems.map((i) => ({ id: i.id, size: i.size, quantity: i.quantity })),
-        appliedPromoCode
-      );
-
-      // Demo mode (no live Razorpay keys): record the order as pending
-      // so the full flow can be exercised without a real payment.
-      if (order.mock) {
-        const saved = await recordOrder({ razorpay_order_id: order.id });
-        setCheckoutSuccess({ paymentId: "—", orderId: saved.orderId, amount: saved.amount, pending: true });
-        clearCart();
-        closeCart("cart");
-        setCheckoutStep("cart");
-        return;
-      }
-
-      const scriptLoaded = await loadRazorpayScript();
-      if (!scriptLoaded) {
-        throw new Error("Razorpay failed to load. Please check your internet connection.");
-      }
-
-      const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        amount: order.amount,
-        currency: order.currency || "INR",
-        name: "ZIVA",
-        description: "Luxury Skincare & Makeup",
-        image: "/Logo.png",
-        order_id: order.id,
-        handler: async function (paymentResult: {
-          razorpay_order_id: string;
-          razorpay_payment_id: string;
-          razorpay_signature: string;
-        }) {
-          try {
-            const saved = await recordOrder(paymentResult);
-            setCheckoutSuccess({
-              paymentId: paymentResult.razorpay_payment_id,
-              orderId: saved.orderId,
-              amount: saved.amount,
-            });
-            clearCart();
-            closeCart("cart");
-            setCheckoutStep("cart");
-          } catch (err) {
-            console.error("Order recording failed:", err);
-            setCheckoutError(
-              `Payment succeeded (id ${paymentResult.razorpay_payment_id}) but the order could not be saved. Please contact support.`
-            );
-          } finally {
-            setIsCheckingOut(false);
-          }
-        },
-        prefill: {
-          name: shippingDetails.name,
-          email: shippingDetails.email,
-          contact: shippingDetails.phone,
-        },
-        theme: {
-          color: "#C9A961",
-        },
-        modal: {
-          ondismiss: function() {
-            setIsCheckingOut(false);
-          }
-        }
-      };
-
-      const rzp = new (window as any).Razorpay(options);
-      rzp.open();
-      return;
-    } catch (err) {
-      console.error(err);
-      setCheckoutError(err instanceof Error ? err.message : "An error occurred during checkout. Please try again.");
-    } finally {
-      setIsCheckingOut(false);
-    }
-  };
-
-  // Scroll detection for transparent -> glass transition & hide/show behavior
-  useEffect(() => {
-    let lastScrollY = window.scrollY;
-    
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      setScrolled(currentScrollY > 80);
-      
-      // Hide on scroll down, show on scroll up
-      if (currentScrollY > lastScrollY && currentScrollY > 150) {
-        setVisible(false);
-      } else {
-        setVisible(true);
-      }
-      
-      lastScrollY = currentScrollY;
-    };
-    
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   // Sync scroll lock
   useEffect(() => {
@@ -302,20 +123,6 @@ export default function Navbar() {
   const { subtotal, discountPercent, discount, total } = totals;
   const appliedPromo = appliedPromoCode ? `${appliedPromoCode} · ${discountPercent}% OFF` : "";
 
-  const [currentOfferIndex, setCurrentOfferIndex] = useState(0);
-  const offersList = [
-    "✨ Free Shipping on All Orders • Limited Time Offer ✨",
-    "🌿 Flat 15% Off on First Order • Use Code: ZIVA15 🌿",
-    "🛡️ Dermatologist Approved Active Gold Formulas 🛡️"
-  ];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentOfferIndex((prev) => (prev + 1) % offersList.length);
-    }, 3500);
-    return () => clearInterval(interval);
-  }, []);
-
   const menuItems = [
     { name: "Home", href: "/" },
     { name: "Shop", href: "/products" },
@@ -329,46 +136,11 @@ export default function Navbar() {
   return (
     <>
       {/* 1. Global Announcement Bar (centered, arrow-cycled) */}
-      <div className="w-full candy-gradient-bg text-white select-none relative z-50 h-[38px] flex items-center">
-        <div className="max-w-3xl mx-auto w-full flex items-center justify-center gap-3 px-4 h-full">
-          <button
-            onClick={() => setCurrentOfferIndex((p) => (p - 1 + offersList.length) % offersList.length)}
-            aria-label="Previous offer"
-            className="p-1 text-white/60 hover:text-white transition-colors cursor-pointer"
-          >
-            <ChevronLeft className="w-3.5 h-3.5" />
-          </button>
-          <div className="relative flex-1 h-4 flex items-center justify-center overflow-hidden">
-            {offersList.map((offer, i) => (
-              <span
-                key={i}
-                className={`absolute text-center text-[9px] sm:text-[10px] tracking-[0.22em] uppercase font-semibold transition-all duration-500 ease-in-out ${
-                  i === currentOfferIndex
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 -translate-y-3 pointer-events-none"
-                }`}
-              >
-                {offer}
-              </span>
-            ))}
-          </div>
-          <button
-            onClick={() => setCurrentOfferIndex((p) => (p + 1) % offersList.length)}
-            aria-label="Next offer"
-            className="p-1 text-white/60 hover:text-white transition-colors cursor-pointer"
-          >
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      </div>
+     
 
       {/* 2. Sticky single-row Navbar — logo left · centered links · icons right */}
-      <header className={`fixed z-40 w-full transition-all duration-300 ease-in-out bg-white shadow-[0_4px_24px_rgba(0,0,0,0.03)] border-b border-stone-100 ${
-        scrolled ? "top-0" : "top-[38px]"
-      } ${
-        visible ? "translate-y-0" : "-translate-y-[100%]"
-      }`}>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[68px] flex items-center justify-between">
+      <header className={" w-full transition-all duration-300 ease-in-out bg-white shadow-[0_4px_24px_rgba(0,0,0,0.03)] border-b border-stone-100 "}>
+        <div className="relative max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 h-[68px] flex items-center justify-between">
 
           {/* Left: Hamburger (mobile) + Logo */}
           <div className="flex items-center gap-3">
@@ -383,8 +155,8 @@ export default function Navbar() {
               <Image
                 src="/ziva_beauty_logo.png"
                 alt="ZIVA"
-                width={186}
-                height={120}
+                width={198}
+                height={125}
                 priority
                 className="h-10 w-auto object-contain"
               />
@@ -397,10 +169,10 @@ export default function Navbar() {
               <Link
                 key={item.name}
                 href={item.href}
-                className="group relative text-[13px] font-bold uppercase tracking-[0.12em] text-ink hover:text-gold-deep transition-colors"
+                className="group relative text-[13px] font-medium uppercase  text-ink hover:text-gold-deep transition-colors"
               >
                 {item.name}
-                <span className="absolute -bottom-1.5 left-0 h-[2px] w-0 rounded-full bg-gold-deep transition-all duration-300 group-hover:w-full" />
+                <span className="absolute -bottom-1.5 left-0 h-[2px] w-0 rounded-full bg-gold transition-all duration-300 group-hover:w-full" />
               </Link>
             ))}
           </nav>
@@ -453,6 +225,15 @@ export default function Navbar() {
 
         </div>
       </header>
+      {/* Secondary promo nav */}
+      <div className="relative z-40 w-full bg-black text-white">
+        <div className="flex h-11 items-center justify-center px-4 text-center lg:text-[18px] text-[14px] font-medium tracking-wide sm:text-[18px]">
+          Upto 15% off on all products{" "}
+          <Link href="/products" className="ml-1.5 text-gold transition-colors hover:text-gold-light">
+            Shop Now
+          </Link>
+        </div>
+      </div>
 
       {/* Modals & Drawers */}
       <AnimatePresence>
@@ -552,11 +333,11 @@ export default function Navbar() {
               </div>
 
               <div className="flex-1 overflow-y-auto py-2 px-6 divide-y divide-stone-100">
-                {checkoutStep === "shipping" ? (
+                {checkout.step === "shipping" ? (
                   <div className="py-4 flex flex-col gap-4 text-black">
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#C9A961]">Shipping Information</h3>
-                      <button onClick={() => setCheckoutStep("cart")} className="text-[9px] uppercase tracking-widest text-stone-400 hover:text-black">
+                      <button onClick={() => checkout.backToCart()} className="text-[9px] uppercase tracking-widest text-stone-400 hover:text-black">
                         Back to Bag
                       </button>
                     </div>
@@ -566,8 +347,8 @@ export default function Navbar() {
                         <input
                           type="text"
                           required
-                          value={shippingDetails.name}
-                          onChange={(e) => setShippingDetails({ ...shippingDetails, name: e.target.value })}
+                          value={checkout.shipping.name}
+                          onChange={(e) => checkout.updateShipping({name: e.target.value })}
                           className="w-full px-3 py-2 text-xs border border-stone-200 focus:outline-none focus:border-[#C9A961] bg-stone-50/50 text-black font-medium"
                           placeholder="John Doe"
                         />
@@ -578,8 +359,8 @@ export default function Navbar() {
                           <input
                             type="email"
                             required
-                            value={shippingDetails.email}
-                            onChange={(e) => setShippingDetails({ ...shippingDetails, email: e.target.value })}
+                            value={checkout.shipping.email}
+                            onChange={(e) => checkout.updateShipping({email: e.target.value })}
                             className="w-full px-3 py-2 text-xs border border-stone-200 focus:outline-none focus:border-[#C9A961] bg-stone-50/50 text-black font-medium"
                             placeholder="john@example.com"
                           />
@@ -589,8 +370,8 @@ export default function Navbar() {
                           <input
                             type="tel"
                             required
-                            value={shippingDetails.phone}
-                            onChange={(e) => setShippingDetails({ ...shippingDetails, phone: e.target.value })}
+                            value={checkout.shipping.phone}
+                            onChange={(e) => checkout.updateShipping({phone: e.target.value })}
                             className="w-full px-3 py-2 text-xs border border-stone-200 focus:outline-none focus:border-[#C9A961] bg-stone-50/50 text-black font-medium"
                             placeholder="+91 99999 99999"
                           />
@@ -601,8 +382,8 @@ export default function Navbar() {
                         <input
                           type="text"
                           required
-                          value={shippingDetails.address}
-                          onChange={(e) => setShippingDetails({ ...shippingDetails, address: e.target.value })}
+                          value={checkout.shipping.address}
+                          onChange={(e) => checkout.updateShipping({address: e.target.value })}
                           className="w-full px-3 py-2 text-xs border border-stone-200 focus:outline-none focus:border-[#C9A961] bg-stone-50/50 text-black font-medium"
                           placeholder="Flat, House no., Apartment, Street"
                         />
@@ -613,8 +394,8 @@ export default function Navbar() {
                           <input
                             type="text"
                             required
-                            value={shippingDetails.city}
-                            onChange={(e) => setShippingDetails({ ...shippingDetails, city: e.target.value })}
+                            value={checkout.shipping.city}
+                            onChange={(e) => checkout.updateShipping({city: e.target.value })}
                             className="w-full px-2 py-2 text-xs border border-stone-200 focus:outline-none focus:border-[#C9A961] bg-stone-50/50 text-black font-medium"
                             placeholder="Mumbai"
                           />
@@ -624,8 +405,8 @@ export default function Navbar() {
                           <input
                             type="text"
                             required
-                            value={shippingDetails.state}
-                            onChange={(e) => setShippingDetails({ ...shippingDetails, state: e.target.value })}
+                            value={checkout.shipping.state}
+                            onChange={(e) => checkout.updateShipping({state: e.target.value })}
                             className="w-full px-2 py-2 text-xs border border-stone-200 focus:outline-none focus:border-[#C9A961] bg-stone-50/50 text-black font-medium"
                             placeholder="Maharashtra"
                           />
@@ -635,8 +416,8 @@ export default function Navbar() {
                           <input
                             type="text"
                             required
-                            value={shippingDetails.pincode}
-                            onChange={(e) => setShippingDetails({ ...shippingDetails, pincode: e.target.value })}
+                            value={checkout.shipping.pincode}
+                            onChange={(e) => checkout.updateShipping({pincode: e.target.value })}
                             className="w-full px-2 py-2 text-xs border border-stone-200 focus:outline-none focus:border-[#C9A961] bg-stone-50/50 text-black font-medium"
                             placeholder="400001"
                           />
@@ -736,19 +517,19 @@ export default function Navbar() {
                     </div>
                   </div>
 
-                  {checkoutError && (
+                  {checkout.error && (
                     <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-[10px] font-medium leading-relaxed rounded">
-                      {checkoutError}
+                      {checkout.error}
                     </div>
                   )}
 
                   <Magnetic>
                     <button
-                      onClick={onProceedClick}
-                      disabled={isCheckingOut}
+                      onClick={checkout.proceed}
+                      disabled={checkout.isProcessing}
                       className="w-full py-4 text-[10px] font-bold uppercase tracking-[0.25em] bg-gradient-to-r from-[#A8841B] via-[#F5E396] to-[#C9A961] text-black hover:bg-black hover:text-white transition-all shadow-[0_4px_20px_rgba(201,162,39,0.15)] hover:shadow-lg duration-300 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
                     >
-                      {isCheckingOut ? (
+                      {checkout.isProcessing ? (
                         <>
                           <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-black" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -757,7 +538,7 @@ export default function Navbar() {
                           Processing...
                         </>
                       ) : (
-                        checkoutStep === "cart" ? "Proceed To Checkout" : "Pay with Razorpay"
+                        checkout.step === "cart" ? "Proceed To Checkout" : "Pay with Razorpay"
                       )}
                     </button>
                   </Magnetic>
@@ -889,13 +670,13 @@ export default function Navbar() {
 
       {/* 7. Checkout Success Modal */}
       <AnimatePresence>
-        {checkoutSuccess && (
+        {checkout.success && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.5 }}
               exit={{ opacity: 0 }}
-              onClick={() => setCheckoutSuccess(null)}
+              onClick={() => checkout.dismissSuccess()}
               className="fixed inset-0 bg-[#0D0D0D]"
             />
             <motion.div 
@@ -909,29 +690,29 @@ export default function Navbar() {
                 <Sparkles className="w-8 h-8" />
               </div>
               <h3 className="text-2xl font-serif text-black mb-2">
-                {checkoutSuccess.pending ? "Order Placed" : "Order Confirmed"}
+                {checkout.success.pending ? "Order Placed" : "Order Confirmed"}
               </h3>
               <p className="text-stone-500 text-xs font-light mb-6">
-                {checkoutSuccess.pending
+                {checkout.success.pending
                   ? "Your order was recorded in demo mode — payment is marked as pending."
                   : "Thank you for your order! Your payment was processed successfully."}
               </p>
               <div className="w-full bg-[#FAF8F5] border border-stone-100 rounded-2xl p-4 flex flex-col gap-2.5 text-left text-xs mb-6 text-stone-600">
                 <div className="flex justify-between">
                   <span className="font-light">Payment ID</span>
-                  <span className="font-mono text-[10px] text-black select-all">{checkoutSuccess.paymentId}</span>
+                  <span className="font-mono text-[10px] text-black select-all">{checkout.success.paymentId}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="font-light">Order ID</span>
-                  <span className="font-mono text-[10px] text-black select-all">{checkoutSuccess.orderId}</span>
+                  <span className="font-mono text-[10px] text-black select-all">{checkout.success.orderId}</span>
                 </div>
                 <div className="flex justify-between border-t border-stone-200/50 pt-2.5 mt-1 font-semibold text-black">
                   <span>Amount Paid</span>
-                  <span className="text-[#C9A961]">₹{checkoutSuccess.amount.toLocaleString('en-IN')}</span>
+                  <span className="text-[#C9A961]">₹{checkout.success.amount.toLocaleString('en-IN')}</span>
                 </div>
               </div>
               <button 
-                onClick={() => setCheckoutSuccess(null)}
+                onClick={() => checkout.dismissSuccess()}
                 className="w-full py-3.5 bg-[#0D0D0D] hover:bg-[#C9A961] text-white hover:text-black text-xs font-bold uppercase tracking-widest rounded-full transition-colors cursor-pointer"
               >
                 Continue Shopping
@@ -1025,11 +806,13 @@ export default function Navbar() {
                     <div className="flex flex-col gap-0.5">
                       <span className="text-[10px] text-stone-400 font-bold uppercase">Order Date</span>
                       <span className="font-bold text-ink">
-                        {new Date(trackedOrder.time_stamp ?? Date.now()).toLocaleDateString("en-IN", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric"
-                        })}
+                        {trackedOrder.time_stamp
+                          ? new Date(trackedOrder.time_stamp).toLocaleDateString("en-IN", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            })
+                          : "—"}
                       </span>
                     </div>
                     <div className="flex flex-col gap-0.5">

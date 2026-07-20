@@ -75,11 +75,12 @@ export default function BeforeAfter({
         className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden"
         style={{ clipPath: `polygon(0 0, ${sliderPosition}% 0, ${sliderPosition}% 100%, 0 100%)` }}
       >
-        <img 
-          src={beforeImage} 
-          alt="Before Ziva Treatment" 
+        {/* Wrapper is already inset-0 (full container size), so w-full equals
+            the container width — no ref measurement needed during render. */}
+        <img
+          src={beforeImage}
+          alt="Before Ziva Treatment"
           className="absolute inset-0 w-full h-full object-cover max-w-none"
-          style={{ width: containerRef.current?.getBoundingClientRect().width || "100%" }}
         />
         <div className="absolute bottom-4 left-4 z-10 glass-panel px-4 py-2 text-[10px] uppercase font-bold tracking-widest text-stone-500 shadow-sm">
           {beforeLabel}

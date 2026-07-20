@@ -121,7 +121,7 @@ export default function ProductCard({
         <div className="mt-auto flex flex-col gap-2.5 border-t border-stone-100 pt-3">
           <Price price={product.price} oldPrice={product.oldPrice} size="md" />
           <button
-            onClick={() => available && addToCart(product, product.sizes?.[0] || "Standard")}
+            onClick={() => available && addToCart(product)}
             disabled={!available}
             className="flex w-full items-center justify-center gap-2 border border-ink bg-transparent py-2.5 text-[10px] font-bold uppercase tracking-[0.2em] text-ink transition-colors duration-300 hover:bg-ink hover:text-cream disabled:cursor-not-allowed disabled:border-stone-200 disabled:text-stone-300 disabled:hover:bg-transparent"
           >
