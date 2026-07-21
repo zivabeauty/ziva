@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/makeup" },
 };
 
-const HERO_IMAGE = "/makeup_banner.png";
+const HERO_IMAGE = "/makeup_banner.webp";
 
 const highlights = [
   { icon: Palette, title: "Every Look", sub: "Natural to occasion-ready" },

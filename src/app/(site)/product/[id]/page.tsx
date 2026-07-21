@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -19,7 +19,12 @@ import Tilt from "@/components/Tilt";
 import { products as staticProducts } from "@/data/beautyData";
 import { useProduct, useProducts } from "@/features/products/hooks/useProducts";
 import { useWishlist } from "@/features/wishlist/hooks/useWishlist";
-import { addToCart, inStock } from "@/lib/product-utils";
+import { addToCart, inStock, SITE_DISCOUNT_PERCENT } from "@/lib/product-utils";
+import Price from "@/components/ui/Price";
+
+/** Tiny neutral blur so the main photo feels instant while the real file loads. */
+const IMAGE_BLUR =
+  "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPjxyZWN0IHdpZHRoPSI4IiBoZWlnaHQ9IjgiIGZpbGw9IiNmNWY1ZjQiLz48L3N2Zz4=";
 
 export default function ProductPage() {
   const params = useParams();
@@ -113,13 +118,22 @@ export default function ProductPage() {
           <div className="flex flex-row md:flex-col gap-4 w-full md:w-24 overflow-x-auto md:overflow-x-visible">
             {productImages.map((img, idx) => (
               <button
-                key={idx}
+                key={img}
+                type="button"
                 onClick={() => setActiveImage(img)}
                 className={`relative w-20 md:w-full aspect-square border overflow-hidden transition-all rounded-xl shrink-0 ${
                   activeImage === img ? "border-[#C9A961] scale-102 shadow-xs" : "border-stone-200 opacity-60 hover:opacity-100"
                 }`}
               >
-                <Image src={img} alt="Thumbnail" fill sizes="96px" className="object-cover" />
+                <Image
+                  src={img}
+                  alt={`${product.name} view ${idx + 1}`}
+                  fill
+                  sizes="80px"
+                  quality={60}
+                  loading={idx < 2 ? "eager" : "lazy"}
+                  className="object-cover"
+                />
               </button>
             ))}
           </div>
@@ -138,12 +152,16 @@ export default function ProductPage() {
               onClick={() => setIsLightboxOpen(true)}
             >
               <Image
+                key={activeImage}
                 src={activeImage}
                 alt={product.name}
                 fill
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                quality={85}
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 70vw, 700px"
+                quality={75}
                 priority
+                fetchPriority="high"
+                placeholder="blur"
+                blurDataURL={IMAGE_BLUR}
                 className="object-cover transition-transform duration-100"
                 style={zoomed ? {
                   transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
@@ -180,14 +198,13 @@ export default function ProductPage() {
 
             {/* Price & availability */}
             <div className="flex flex-col gap-1 border-y border-stone-150 py-4">
-              <div className="flex items-center gap-4 text-2xl font-serif">
-                <span className="font-semibold text-black">{product.price}</span>
-                {product.oldPrice && (
-                  <span className="text-sm text-stone-400 line-through font-light">{product.oldPrice}</span>
+              <div className="flex items-center gap-4">
+                <Price price={product.price} oldPrice={product.oldPrice} size="lg" showDiscount={false} />
+                {SITE_DISCOUNT_PERCENT > 0 && (
+                  <span className="text-[8px] bg-[#C9A961]/10 text-[#C9A961] border border-[#C9A961]/20 px-2 py-0.5 font-bold uppercase tracking-widest rounded-full">
+                    Save {SITE_DISCOUNT_PERCENT}%
+                  </span>
                 )}
-                <span className="text-[8px] bg-[#C9A961]/10 text-[#C9A961] border border-[#C9A961]/20 px-2 py-0.5 font-bold uppercase tracking-widest rounded-full">
-                  Save 20%
-                </span>
               </div>
               <div className="flex justify-between text-[10px] text-stone-400 font-light tracking-wide mt-1">
                 <span>
@@ -313,7 +330,7 @@ export default function ProductPage() {
                   </div>
                   <div className="flex flex-col gap-1">
                     <h4 className="text-xs font-semibold text-stone-900 tracking-wide line-clamp-1 mb-1">{prod.name}</h4>
-                    <span className="text-xs font-bold text-[#C9A961]">{prod.price}</span>
+                    <span className="text-xs font-bold text-[#C9A961]"><Price price={prod.price} oldPrice={prod.oldPrice} size="sm" showDiscount={false} /></span>
                   </div>
                   <button 
                     onClick={() => router.push(`/product/${prod.id}`)}
@@ -342,7 +359,9 @@ export default function ProductPage() {
               <div className="flex flex-col justify-between h-full">
                 <div>
                   <h4 className="text-xs font-semibold text-stone-900 line-clamp-1">{prod.name}</h4>
-                  <span className="text-xs font-bold text-black block mt-0.5">{prod.price}</span>
+                  <span className="text-xs font-bold text-black block mt-0.5">
+                    <Price price={prod.price} oldPrice={prod.oldPrice} size="sm" showDiscount={false} />
+                  </span>
                 </div>
                 <Link href={`/product/${prod.id}`} className="text-[9px] font-bold uppercase tracking-wider text-[#C9A961] hover:text-black mt-2">
                   View Detail
@@ -357,7 +376,9 @@ export default function ProductPage() {
       <div className="fixed bottom-0 left-0 right-0 z-30 bg-white/90 backdrop-blur-xl border-t border-stone-200 py-3.5 px-4 flex sm:hidden items-center justify-between shadow-lg">
         <div className="flex flex-col">
           <span className="text-[8px] uppercase tracking-widest text-stone-400">Total Price</span>
-          <span className="text-sm font-bold text-black">{product.price}</span>
+          <span className="text-sm font-bold text-black">
+            <Price price={product.price} oldPrice={product.oldPrice} size="sm" showDiscount={false} />
+          </span>
         </div>
         <button 
           onClick={handleAddToCart}

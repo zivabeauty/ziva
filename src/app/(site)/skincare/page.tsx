@@ -23,7 +23,7 @@ export default function SkincarePage() {
       <section className="block w-full sm:h-[70vh] overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/skin_carebanner.png"
+          src="/skin_carebanner.webp"
           alt="Ziva skincare collection"
           className="h-full w-full object-cover object-center"
         />

@@ -119,7 +119,7 @@ export default function Footer() {
             <div className="">
             <Link href="/" >
               <Image
-                src="/ziva_beauty_logo.png"
+                src="/ziva_beauty_logo.webp"
                 alt="ZIVA"
                 width={198}
                 height={165}

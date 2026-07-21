@@ -78,7 +78,7 @@ export function openRazorpayCheckout({
     currency,
     name: "ZIVA",
     description: "Luxury Skincare & Makeup",
-    image: "/Logo.png",
+    image: "/Logo.webp",
     order_id: orderId,
     handler: onSuccess,
     prefill,

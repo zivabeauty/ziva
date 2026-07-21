@@ -30,7 +30,7 @@ export const metadata: Metadata = {
       "Refined, clean-beauty skincare and makeup — crafted with premium botanicals and gold-standard actives.",
     siteName: "ZIVA",
     type: "website",
-    images: [{ url: "/ziva_banner.png", width: 1200, height: 630, alt: "ZIVA Beauty" }],
+    images: [{ url: "/ziva5.webp", width: 1200, height: 630, alt: "ZIVA Beauty" }],
   },
   twitter: {
     card: "summary_large_image",

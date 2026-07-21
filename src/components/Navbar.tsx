@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import Magnetic from "./Magnetic";
 import type { OrderRecord, WishlistItem } from "@/lib/cart-types";
-import { parsePrice, PROMO_CODES } from "@/lib/pricing";
+import { PROMO_CODES, getDiscountedPrice, formatInr } from "@/lib/pricing";
 import { useCart } from "@/features/cart/hooks/useCart";
 import { useWishlist } from "@/features/wishlist/hooks/useWishlist";
 import { useUiStore } from "@/store/ui.store";
@@ -112,7 +112,7 @@ export default function Navbar() {
       id: item.id,
       name: item.name,
       size: "Standard",
-      price: parsePrice(item.price),
+      price: getDiscountedPrice(item.price),
       quantity: 1,
       image: item.image,
     });
@@ -153,7 +153,7 @@ export default function Navbar() {
             </button>
             <Link href="/" className="flex items-center select-none">
               <Image
-                src="/ziva_beauty_logo.png"
+                src="/ziva_beauty_logo.webp"
                 alt="ZIVA"
                 width={198}
                 height={125}
@@ -229,7 +229,7 @@ export default function Navbar() {
       <div className="w-full h-10 sm:h-12 md:h-14 lg:h-[50px] bg-white">
         <div className="w-full h-full flex items-center justify-center bg-black">
           <Image
-            src="/Zivabeauty_Website.png"
+            src="/Zivabeauty_Website.webp"
             alt="Promo Nav"
             width={450}
             height={450}
@@ -590,7 +590,7 @@ export default function Navbar() {
                         <div>
                           <div className="flex justify-between text-[11px] font-medium text-black">
                             <h3 className="line-clamp-2 pr-2 text-stone-900 tracking-wide">{item.name}</h3>
-                            <p className="ml-2 font-medium">{item.price}</p>
+                            <p className="ml-2 font-medium">{formatInr(getDiscountedPrice(item.price))}</p>
                           </div>
                           <p className="mt-1 text-[9px] text-[#C9A961] font-semibold uppercase tracking-widest">{item.category}</p>
                         </div>

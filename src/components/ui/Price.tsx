@@ -1,4 +1,4 @@
-import { parsePrice, formatInr } from "@/lib/pricing";
+import { getDisplayPricing } from "@/lib/pricing";
 
 interface PriceProps {
   price: string | number;
@@ -22,17 +22,22 @@ export default function Price({
   showDiscount = true,
   className = "",
 }: PriceProps) {
-  const now = parsePrice(price);
-  const was = parsePrice(oldPrice);
-  const hasDiscount = was > now;
-  const pct = hasDiscount ? Math.round(((was - now) / was) * 100) : 0;
+  const { price: now, oldPrice: was, percent: pct } = getDisplayPricing({
+    price: String(price),
+    oldPrice: oldPrice != null ? String(oldPrice) : undefined,
+  });
+  const hasDiscount = was > now && pct > 0;
   const s = SIZES[size];
 
   return (
     <div className={`flex items-baseline gap-2 flex-wrap ${className}`}>
-      <span className={`${s.now} font-semibold text-ink`}>{formatInr(now)}</span>
+      <span className={`${s.now} font-semibold text-ink`}>
+        ₹{Math.round(now).toLocaleString("en-IN")}
+      </span>
       {hasDiscount && (
-        <span className={`${s.was} text-stone-400 line-through`}>{formatInr(was)}</span>
+        <span className={`${s.was} text-stone-400 line-through`}>
+          ₹{Math.round(was).toLocaleString("en-IN")}
+        </span>
       )}
       {hasDiscount && showDiscount && (
         <span className="text-[10px] font-bold uppercase tracking-wider text-gold-deep">

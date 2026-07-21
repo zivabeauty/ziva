@@ -12,25 +12,25 @@ const categories = [
   {
     name: "Skincare",
     href: "/skincare",
-    image: "/Dtan_pack.png",
+    image: "/Dtan_pack.webp",
     description: "Cleanse, exfoliate, and refresh everyday essentials that fit your routine.",
   },
   {
     name: "Makeup",
     href: "/makeup",
-    image: "/foundation01.png",
+    image: "/foundation01.webp",
     description: "Fresh everyday looks and evening glam, easy to wear and easy to love.",
   },
   {
     name: "Hair Care",
     href: "/hair-care",
-    image: "/keratin_mask.png",
+    image: "/keratin_mask.webp",
     description: "Nourish and soften with care made for healthy-looking hair.",
   },
   {
     name: "Beauty Kits",
     href: "/skincare",
-    image: "/Shampoo and Mask.png",
+    image: "/Shampoo and Mask.webp",
     description: "Curated collections for everyday rituals and special occasions.",
   },
 ];
@@ -39,37 +39,37 @@ const favourites = [
   {
     name: "D-Tan Face Pack",
     href: "/product/4",
-    image: "/Dtan_pack.png",
+    image: "/Dtan_pack.webp",
     description: "Bright, refreshed skin after long days in the sun.",
   },
   {
     name: "Face Exfoliator",
     href: "/product/5",
-    image: "/micro_ploishing.png",
+    image: "/micro_ploishing.webp",
     description: "Smooth away dullness for softer, fresher skin.",
   },
   {
     name: "Makeup Primer",
     href: "/product/7",
-    image: "/magic_primer.png",
+    image: "/magic_primer.webp",
     description: "Smoother makeup that lasts through the day.",
   },
   {
     name: "Liquid Foundation",
     href: "/product/8",
-    image: "/foundation01.png",
+    image: "/foundation01.webp",
     description: "Three shades. Light feel. Naturally even coverage.",
   },
   {
     name: "Keratin Shampoo",
     href: "/product/12",
-    image: "/shampo .png",
+    image: "/shampo .webp",
     description: "Cleanse and nourish with every wash.",
   },
   {
     name: "Keratin Hair Mask",
     href: "/product/13",
-    image: "/keratin_mask.png",
+    image: "/keratin_mask.webp",
     description: "A weekly deep-conditioning ritual.",
   },
 ];
@@ -90,8 +90,8 @@ const routines = [
     products: "D-Tan Face Pack + Face Exfoliator",
     description: "A simple two step reset after long days outdoors.",
     href: "/skincare",
-    image: "/dtan_expoilt.png",
-    hoverImage: "/dtan+exfoliant.png",
+    image: "/dtan_expoilt.webp",
+    hoverImage: "/dtan+exfoliant.webp",
     badge: "Best Pair",
   },
   {
@@ -99,8 +99,8 @@ const routines = [
     products: "Keratin Shampoo + Mask",
     description: "Soft, manageable, healthy looking hair every wash.",
     href: "/hair-care",
-    image: "/Shampoo and Mask.png",
-    hoverImage: "/Shampoo and Mask (2).png",
+    image: "/Shampoo and Mask.webp",
+    hoverImage: "/Shampoo and Mask (2).webp",
     badge: "Hair Duo",
   },
   {
@@ -108,8 +108,8 @@ const routines = [
     products: "Eye Maskara + Linear Maskara",
     description: "Collections for everyday care and celebrations.",
     href: "/skincare",
-    image: "/eyelinear_maskara.png",
-    hoverImage: "/linear+maskara.png",
+    image: "/eyelinear_maskara.webp",
+    hoverImage: "/linear+maskara.webp",
     badge: "Kit Bundle",
   },
   {
@@ -117,8 +117,8 @@ const routines = [
     products: "primer + foundation",
     description: "Collections for everyday care and celebrations.",
     href: "/makeup",
-    image: "/foundation_primer.png",
-    hoverImage: "/foundation+primer.png",
+    image: "/foundation_primer.webp",
+    hoverImage: "/foundation+primer.webp",
     badge: "Kit Bundle",
   },
 ];
@@ -344,7 +344,7 @@ export default function Home() {
       {/* Hair ritual feature band */}
       <section className="relative min-h-[420px] overflow-hidden sm:min-h-[520px]">
         <img
-          src="/Shampoo and Mask.png"
+          src="/Shampoo and Mask.webp"
           alt="Keratin Shampoo and Mask"
           className="absolute inset-0 h-full w-full object-cover"
         />
@@ -489,7 +489,7 @@ export default function Home() {
       </section>
 
       {/* ₹499 Store — slideable product carousel */}
-      {/* <Store499 /> */}
+      <Store499 />
 
       <ReviewsCarousel />
 

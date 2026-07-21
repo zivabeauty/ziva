@@ -9,7 +9,7 @@ function InstagramIcon({ className }: { className?: string }) {
 }
 
 /* Ziva Instagram — replace the handle/URL and swap these images for your real
-   Instagram photos anytime (a URL or a /local-file.png both work). */
+   Instagram photos anytime (a URL or a /local-file.webp both work). */
 const IG_HANDLE = "@ziva.beauty";
 const IG_URL = "https://instagram.com/ziva.beauty";
 

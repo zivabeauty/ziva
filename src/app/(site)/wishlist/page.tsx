@@ -6,7 +6,8 @@ import Magnetic from "@/components/Magnetic";
 import { useWishlist } from "@/features/wishlist/hooks/useWishlist";
 import { useCart } from "@/features/cart/hooks/useCart";
 import { useUiStore } from "@/store/ui.store";
-import { parsePrice } from "@/lib/pricing";
+import { getDiscountedPrice } from "@/lib/pricing";
+import Price from "@/components/ui/Price";
 
 export default function WishlistPage() {
   const { items: wishlistItems, remove } = useWishlist();
@@ -18,7 +19,7 @@ export default function WishlistPage() {
       id: item.id,
       name: item.name,
       size: "Standard",
-      price: parsePrice(item.price),
+      price: getDiscountedPrice(item.price),
       quantity: 1,
       image: item.image,
     });
@@ -61,7 +62,7 @@ export default function WishlistPage() {
                 <div>
                   <span className="text-[9px] text-[#C9A961] font-semibold uppercase tracking-widest block mb-1">{item.category}</span>
                   <h3 className="text-xs font-semibold text-stone-900 tracking-wide mb-1 line-clamp-1">{item.name}</h3>
-                  <span className="text-sm font-bold text-black">{item.price}</span>
+                  <Price price={item.price} size="sm" />
                 </div>
 
                 <div className="mt-6">

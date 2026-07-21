@@ -29,7 +29,7 @@ export const skincarePage: CategoryPageConfig = {
   eyebrow: "The Skin Ritual",
   title: "Skincare",
   titleAccent: "Collection",
-  heroImage: "/Korean Glass glow Facial kit/thumbnail.png",
+  heroImage: "/Korean Glass glow Facial kit/thumbnail.webp",
   heroDescription:
     "Dermatologist-tested botanical rituals — from glass-skin facials to active gold elixirs — crafted for visible radiance and lasting barrier health.",
   editorialTitle: "Where Science Meets the Sacred Ritual",
@@ -57,7 +57,7 @@ export const hairCarePage: CategoryPageConfig = {
   eyebrow: "The Hair Ritual",
   title: "Hair Care",
   titleAccent: "Collection",
-  heroImage: "/Keratin Shampoo/thumbnail.png",
+  heroImage: "/Keratin Shampoo/thumbnail.webp",
   heroDescription:
     "Salon-grade botanical hair care — keratin repair, deep nourishment, and strength-building formulas for hair that moves with luminous health.",
   editorialTitle: "Strength, Shine & Restoration",
@@ -85,7 +85,7 @@ export const makeupPage: CategoryPageConfig = {
   eyebrow: "The Color Ritual",
   title: "Makeup",
   titleAccent: "Collection",
-  heroImage: "/Lipsticks/thumbnail.png",
+  heroImage: "/Lipsticks/thumbnail.webp",
   heroDescription:
     "Luxury colour cosmetics — velvet mattes, luminous primers, and flawless foundations — infused with skincare actives for beauty that cares for your skin.",
   editorialTitle: "Colour That Performs & Protects",
@@ -111,7 +111,7 @@ export const aboutContent = {
   eyebrow: "Our Story",
   title: "About",
   titleAccent: "Ziva",
-  heroImage: "/Magic Cream/thumbnail.png",
+  heroImage: "/Magic Cream/thumbnail.webp",
   intro:
     "ZIVA was born from a simple belief: luxury beauty should feel joyful, perform brilliantly, and respect both your skin and the planet. We craft dermatologist-tested skincare, hair care, and colour cosmetics powered by feel-good botanicals and gold-standard actives.",
   story: [
