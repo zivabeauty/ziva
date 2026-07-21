@@ -19,7 +19,7 @@ import Tilt from "@/components/Tilt";
 import { products as staticProducts } from "@/data/beautyData";
 import { useProduct, useProducts } from "@/features/products/hooks/useProducts";
 import { useWishlist } from "@/features/wishlist/hooks/useWishlist";
-import { addToCart, inStock, SITE_DISCOUNT_PERCENT } from "@/lib/product-utils";
+import { addToCart, inStock } from "@/lib/product-utils";
 import Price from "@/components/ui/Price";
 
 /** Tiny neutral blur so the main photo feels instant while the real file loads. */
@@ -199,12 +199,7 @@ export default function ProductPage() {
             {/* Price & availability */}
             <div className="flex flex-col gap-1 border-y border-stone-150 py-4">
               <div className="flex items-center gap-4">
-                <Price price={product.price} oldPrice={product.oldPrice} size="lg" showDiscount={false} />
-                {SITE_DISCOUNT_PERCENT > 0 && (
-                  <span className="text-[8px] bg-[#C9A961]/10 text-[#C9A961] border border-[#C9A961]/20 px-2 py-0.5 font-bold uppercase tracking-widest rounded-full">
-                    Save {SITE_DISCOUNT_PERCENT}%
-                  </span>
-                )}
+                <Price price={product.price} oldPrice={product.oldPrice} size="lg" />
               </div>
               <div className="flex justify-between text-[10px] text-stone-400 font-light tracking-wide mt-1">
                 <span>

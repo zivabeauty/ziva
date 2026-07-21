@@ -8,9 +8,6 @@ import type { Product } from "@/data/beautyData";
 
 export const SHIPPING_FEE = 0;
 
-/** Site-wide sale — applied to every product on display and at checkout. */
-export const SITE_DISCOUNT_PERCENT = 15;
-
 /** Price multipliers per size, relative to the base (30 ml) price. */
 const SIZE_MULTIPLIERS: Record<string, number> = {
   "30 ml": 1,
@@ -35,31 +32,8 @@ export function formatInr(amount: number): string {
   return `₹${Math.round(amount).toLocaleString("en-IN")}`;
 }
 
-/** Catalog list price after the site-wide discount (before size multipliers). */
-export function getDiscountedPrice(listed: string | number | null | undefined): number {
-  const base = parsePrice(listed);
-  if (!SITE_DISCOUNT_PERCENT) return Math.round(base);
-  return Math.round(base * (1 - SITE_DISCOUNT_PERCENT / 100));
-}
-
-/** Display pair for UI: sale price + strikethrough list price + % off. */
-export function getDisplayPricing(product: Pick<Product, "price" | "oldPrice">) {
-  const listed = parsePrice(product.price);
-  const sale = getDiscountedPrice(listed);
-  if (SITE_DISCOUNT_PERCENT > 0 && listed > sale) {
-    return { price: sale, oldPrice: listed, percent: SITE_DISCOUNT_PERCENT };
-  }
-  const was = parsePrice(product.oldPrice);
-  const hasSaving = was > listed;
-  return {
-    price: Math.round(listed),
-    oldPrice: hasSaving ? was : 0,
-    percent: hasSaving ? Math.round(((was - listed) / was) * 100) : 0,
-  };
-}
-
 export function getUnitPrice(product: Pick<Product, "price">, size?: string): number {
-  const base = getDiscountedPrice(product.price);
+  const base = parsePrice(product.price);
   return Math.round(base * (SIZE_MULTIPLIERS[size ?? ""] ?? 1));
 }
 

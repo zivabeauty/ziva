@@ -6,7 +6,7 @@ import Magnetic from "@/components/Magnetic";
 import { useWishlist } from "@/features/wishlist/hooks/useWishlist";
 import { useCart } from "@/features/cart/hooks/useCart";
 import { useUiStore } from "@/store/ui.store";
-import { getDiscountedPrice } from "@/lib/pricing";
+import { parsePrice } from "@/lib/pricing";
 import Price from "@/components/ui/Price";
 
 export default function WishlistPage() {
@@ -19,7 +19,7 @@ export default function WishlistPage() {
       id: item.id,
       name: item.name,
       size: "Standard",
-      price: getDiscountedPrice(item.price),
+      price: parsePrice(item.price),
       quantity: 1,
       image: item.image,
     });

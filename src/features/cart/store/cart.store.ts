@@ -51,7 +51,7 @@ export const useCartStore = create<CartState>()(
       clearPromoCode: () => set({ promoCode: "" }),
     }),
     {
-      name: "ziva_cart_v2",
+      name: "ziva_cart_v1",
       storage: createJSONStorage(() => createLegacyArrayStorage()),
     }
   )

@@ -1,16 +1,9 @@
 import type { Product } from "@/data/beautyData";
-import {
-  parsePrice,
-  formatInr,
-  getDiscountedPrice,
-  getDisplayPricing,
-  getUnitPrice,
-  SITE_DISCOUNT_PERCENT,
-} from "@/lib/pricing";
+import { parsePrice, formatInr } from "@/lib/pricing";
 import { useCartStore } from "@/features/cart/store/cart.store";
 import { useUiStore } from "@/store/ui.store";
 
-export { parsePrice, formatInr, getDiscountedPrice, getDisplayPricing, getUnitPrice, SITE_DISCOUNT_PERCENT };
+export { parsePrice, formatInr };
 
 /* ═══════════════════════════════════════════════════════════════ */
 /*  Merchandising metadata derivation                                */
@@ -24,9 +17,11 @@ export { parsePrice, formatInr, getDiscountedPrice, getDisplayPricing, getUnitPr
 /** Human-readable price, e.g. "₹1,299". */
 export const inr = (value: string | number | undefined) => formatInr(parsePrice(value));
 
-/** Discount percentage shown on cards (site-wide sale, else price vs oldPrice). */
+/** Discount percentage from price vs oldPrice (0 when there's no saving). */
 export function discountPercent(product: Pick<Product, "price" | "oldPrice">): number {
-  return getDisplayPricing(product).percent;
+  const price = parsePrice(product.price);
+  const old = parsePrice(product.oldPrice);
+  return old > price ? Math.round(((old - price) / old) * 100) : 0;
 }
 
 /** Stable, hydration-safe pseudo-review count derived from the product id. */
@@ -257,7 +252,7 @@ export function addToCart(product: Product, quantity = 1) {
     id: product.id,
     name: product.name,
     size: "Standard",
-    price: getUnitPrice(product),
+    price: parsePrice(product.price),
     quantity,
     image: product.image,
   });
