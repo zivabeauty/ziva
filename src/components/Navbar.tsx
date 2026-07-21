@@ -158,7 +158,7 @@ export default function Navbar() {
                 width={198}
                 height={125}
                 priority
-                className="h-10 w-auto object-contain"
+                className="h-15 w-auto object-contain"
               />
             </Link>
           </div>
@@ -226,12 +226,16 @@ export default function Navbar() {
         </div>
       </header>
       {/* Secondary promo nav */}
-      <div className="relative z-40 w-full bg-black text-white">
-        <div className="flex h-11 items-center justify-center px-4 text-center lg:text-[18px] text-[14px] font-medium tracking-wide sm:text-[18px]">
-          Upto 15% off on all products{" "}
-          <Link href="/products" className="ml-1.5 text-gold transition-colors hover:text-gold-light">
-            Shop Now
-          </Link>
+      <div className="w-full h-10 sm:h-12 md:h-14 lg:h-[50px] bg-white">
+        <div className="w-full h-full flex items-center justify-center bg-black">
+          <Image
+            src="/Zivabeauty_Website.png"
+            alt="Promo Nav"
+            width={450}
+            height={450}
+            className="object-contain"
+            priority
+          />
         </div>
       </div>
 

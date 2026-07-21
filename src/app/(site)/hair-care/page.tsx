@@ -46,7 +46,7 @@ export default function HairCarePage() {
       <section className="block w-full sm:h-[70vh] overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src='/haircare.png'
+          src='/hair_carebanner.png'
           alt="Ziva hair care collection"
           className="h-full w-full object-cover object-center"
         />

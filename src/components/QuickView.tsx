@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ShoppingBag, ArrowRight, Minus, Plus, Heart } from "lucide-react";
 import type { Product } from "@/data/beautyData";
@@ -70,7 +71,7 @@ export default function QuickView({
             </button>
 
             <div className="relative aspect-square w-full bg-porcelain md:w-1/2">
-              <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
+              <Image src={product.image} alt={product.name} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
               {product.badge && (
                 <span className="absolute left-4 top-4 bg-cream/95 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.16em] text-ink shadow-sm">
                   {product.badge}

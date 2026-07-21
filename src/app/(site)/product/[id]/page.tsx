@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Star,
   Heart,
@@ -114,11 +115,11 @@ export default function ProductPage() {
               <button
                 key={idx}
                 onClick={() => setActiveImage(img)}
-                className={`w-20 md:w-full aspect-square border overflow-hidden transition-all rounded-xl shrink-0 ${
+                className={`relative w-20 md:w-full aspect-square border overflow-hidden transition-all rounded-xl shrink-0 ${
                   activeImage === img ? "border-[#C9A961] scale-102 shadow-xs" : "border-stone-200 opacity-60 hover:opacity-100"
                 }`}
               >
-                <img src={img} alt="Thumbnail" className="w-full h-full object-cover" />
+                <Image src={img} alt="Thumbnail" fill sizes="96px" className="object-cover" />
               </button>
             ))}
           </div>
@@ -136,10 +137,14 @@ export default function ProductPage() {
               onMouseLeave={() => setZoomed(false)}
               onClick={() => setIsLightboxOpen(true)}
             >
-              <img 
-                src={activeImage} 
-                alt={product.name} 
-                className="w-full h-full object-cover transition-transform duration-100"
+              <Image
+                src={activeImage}
+                alt={product.name}
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                quality={85}
+                priority
+                className="object-cover transition-transform duration-100"
                 style={zoomed ? {
                   transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
                   transform: "scale(1.8)"
@@ -304,7 +309,7 @@ export default function ProductPage() {
               <Tilt key={prod.id}>
                 <div className="group bg-white border border-stone-200/50 p-4 transition-all duration-300 flex flex-col justify-between hover:shadow-md rounded-2xl h-full">
                   <div className="relative aspect-square overflow-hidden bg-stone-50 mb-4 rounded-xl border border-stone-100">
-                    <img src={prod.image} alt={prod.name} className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500" />
+                    <Image src={prod.image} alt={prod.name} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="object-cover group-hover:scale-102 transition-transform duration-500" />
                   </div>
                   <div className="flex flex-col gap-1">
                     <h4 className="text-xs font-semibold text-stone-900 tracking-wide line-clamp-1 mb-1">{prod.name}</h4>
@@ -333,7 +338,7 @@ export default function ProductPage() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
           {productList.slice(1, 3).map((prod) => (
             <div key={prod.id} className="flex gap-4 items-center p-3 border border-stone-150 bg-[#FAF8F5] rounded-2xl max-w-[280px]">
-              <img src={prod.image} alt={prod.name} className="w-14 h-14 object-cover rounded-xl border border-stone-200/40" />
+              <Image src={prod.image} alt={prod.name} width={56} height={56} sizes="56px" className="h-14 w-14 object-cover rounded-xl border border-stone-200/40" />
               <div className="flex flex-col justify-between h-full">
                 <div>
                   <h4 className="text-xs font-semibold text-stone-900 line-clamp-1">{prod.name}</h4>
@@ -373,7 +378,7 @@ export default function ProductPage() {
             onClick={() => setIsLightboxOpen(false)}
           />
           <div className="relative max-w-2xl w-full aspect-square z-10 rounded-2xl overflow-hidden shadow-2xl">
-            <img src={activeImage} alt={product.name} className="w-full h-full object-cover" />
+            <Image src={activeImage} alt={product.name} fill sizes="(max-width: 768px) 100vw, 672px" quality={90} className="object-cover" />
             <button 
               onClick={() => setIsLightboxOpen(false)}
               className="absolute top-4 right-4 text-white hover:text-[#C9A961] p-2.5 bg-black/50 rounded-full"

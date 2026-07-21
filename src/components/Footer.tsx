@@ -115,16 +115,16 @@ export default function Footer() {
       <div className="mx-auto max-w-8xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-4 md:gap-12">
 
-          <div className="col-span-2 flex flex-col gap-4 md:col-span-1">
-            <div className="flex select-none items-center gap-1">
-            <Link href="/" className="flex items-center select-none">
+          <div className="col-span-2 flex flex-col justify-start md:col-span-1">
+            <div className="">
+            <Link href="/" >
               <Image
                 src="/ziva_beauty_logo.png"
                 alt="ZIVA"
                 width={198}
                 height={165}
                 priority
-                className="h-15 w-auto object-contain"
+                className="h-20 w-auto object-right object-contain"
               />
             </Link>
             </div>
@@ -204,6 +204,9 @@ export default function Footer() {
         <div className="mx-auto flex max-w-8xl flex-col items-center justify-between gap-6 px-4 sm:px-6 md:flex-row lg:px-8">
           <div className="flex flex-col items-center gap-4 text-center text-xs font-medium text-white/50 md:flex-row md:gap-8 md:text-left">
             <p>© {new Date().getFullYear()} ZIVA Beauty. All rights reserved.</p>
+            <p>Designed by <a href="https://digivanta.co/" target="_blank" rel="noopener noreferrer" className="text-gold hover:text-gold-deep">Digivanta</a></p>
+
+          
          
           </div>
 
@@ -217,7 +220,7 @@ export default function Footer() {
                 alt="Google Pay"
                 width={40}
                 height={40}
-                className="h-7 w-auto object-contain"
+                className="h-9 w-auto object-contain"
               />
             </div>
 

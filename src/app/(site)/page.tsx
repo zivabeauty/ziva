@@ -13,7 +13,7 @@ const categories = [
     name: "Skincare",
     href: "/skincare",
     image: "/Dtan_pack.png",
-    description: "Cleanse, exfoliate, and refresh — everyday essentials that fit your routine.",
+    description: "Cleanse, exfoliate, and refresh everyday essentials that fit your routine.",
   },
   {
     name: "Makeup",
@@ -88,7 +88,7 @@ const routines = [
   {
     title: "Refresh & Reset",
     products: "D-Tan Face Pack + Face Exfoliator",
-    description: "A simple two-step reset after long days outdoors.",
+    description: "A simple two step reset after long days outdoors.",
     href: "/skincare",
     image: "/dtan_expoilt.png",
     hoverImage: "/dtan+exfoliant.png",
@@ -97,7 +97,7 @@ const routines = [
   {
     title: "Healthy Hair Ritual",
     products: "Keratin Shampoo + Mask",
-    description: "Soft, manageable, healthy-looking hair — every wash.",
+    description: "Soft, manageable, healthy looking hair every wash.",
     href: "/hair-care",
     image: "/Shampoo and Mask.png",
     hoverImage: "/Shampoo and Mask (2).png",
@@ -123,13 +123,7 @@ const routines = [
   },
 ];
 
-const points = [
-  "Premium beauty essentials for everyday use",
-  "Skincare, makeup, and hair care in one place",
-  "Curated beauty kits for every occasion",
-  "Easy-to-build routines",
-  "Secure shopping and fast delivery across India",
-];
+
 
 const faqs = [
   {
@@ -330,7 +324,7 @@ export default function Home() {
               <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
-          <div className="grid grid-cols-2 divide-x divide-y divide-ink/8 border-t border-ink/8 lg:grid-cols-4 lg:divide-y-0">
+          <div className="grid grid-cols-2 divide-x divide-y divide-ink/8 border-t border-b border-ink/8 lg:grid-cols-4 lg:divide-y-0">
             {moments.map((m) => (
               <Link
                 key={m.label}
@@ -431,9 +425,9 @@ export default function Home() {
                   </p>
                   <Link
                     href={r.href}
-                    className="mt-4 block w-full bg-ink py-3 text-center text-[11px] font-bold uppercase tracking-[0.16em] text-cream transition-colors hover:bg-ink/90"
+                    className="mt-4 block w-full bg-ink py-3  text-center px-5 text-[11px] font-bold uppercase tracking-[0.16em] text-cream transition-colors hover:bg-ink/90"
                   >
-                    Shop the Routine
+                    Shop Now
                   </Link>
                 </div>
               </div>
@@ -453,15 +447,43 @@ export default function Home() {
             subtitle="Every Ziva Beauty collection is created to make beauty feel simple, enjoyable, and easy to come back to."
           />
           <ul className="grid grid-cols-2 gap-3 sm:gap-4">
-            {points.map((point) => (
+            
               <li
-                key={point}
-                className="flex items-start gap-4 border-t border-ink/10 pt-4 text-[15px] font-light leading-relaxed text-ink/70"
+              
+                className="flex items-start gap-4 border-t  border-ink/10 pt-4 text-[15px] font-light leading-relaxed text-ink/70"
               >
                 <span className="mt-2 h-px w-5 shrink-0 bg-ink/30" />
-                {point}
+                <p>Premium beauty essentials for everyday use</p>
               </li>
-            ))}
+              <li
+              
+                className="flex items-start gap-4 border-t  border-ink/10 pt-4 text-[15px] font-light leading-relaxed text-ink/70"
+              >
+                <span className="mt-2 h-px w-5 shrink-0 bg-ink/30" />
+                <p>Skincare, makeup, and hair care in one place</p>
+              </li>
+              <li
+              
+                className="flex items-start gap-4 border-t  border-ink/10 pt-4 text-[15px] font-light leading-relaxed text-ink/70"
+              >
+                <span className="mt-2 h-px w-5 shrink-0 bg-ink/30" />
+                <p>Curated beauty kits for every occasion.</p>
+              </li>
+              <li
+              
+                className="flex items-start gap-4 border-t  border-ink/10 pt-4 text-[15px] font-light leading-relaxed text-ink/70"
+              >
+                <span className="mt-2 h-px w-5 shrink-0 bg-ink/30" />
+                <p>Easy-to-build routines.</p>
+              </li>
+              <li
+              
+                className="flex items-start gap-4 border-t border-b  border-ink/10 pt-4 text-[15px] font-light leading-relaxed text-ink/70"
+              >
+                <span className="mt--to-build routin2 h-px w-5 shrink-0 bg-ink/30" />
+                <p>Secure shopping and fast delivery across India</p>
+              </li>
+          
           </ul>
         </div>
       </section>
@@ -521,13 +543,13 @@ export default function Home() {
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <Link
               href="/products"
-              className="inline-flex bg-cream px-8 py-3.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-ink transition-opacity hover:opacity-90"
+              className="inline-flex bg-cream sm:px-12 px-4 py-4  text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.2em] text-ink transition-opacity hover:opacity-90"
             >
               Explore All Products
             </Link>
             <Link
               href="/products"
-              className="group inline-flex items-center gap-2 border border-cream/30 px-8 py-3.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-cream transition-colors hover:border-cream"
+              className="group inline-flex items-center gap-2 border border-cream/30 sm:px-12 px-4 py-4 text-[11px] sm:text-[11px] font-semibold uppercase tracking-[0.3em] text-cream transition-colors hover:border-cream"
             >
               Shop Best Sellers
             </Link>

@@ -301,23 +301,53 @@ body::before {
   z-index: 100;
 }
 
-/* Refined scrollbar (thin, stone + gold) */
-::-webkit-scrollbar {
-  width: 8px;
+/* Hide scrollbar on mobile — scrolling still works.
+   Target html/body explicitly: the page scrollbar lives on the root,
+   and * alone often fails to hide it in Chrome/Safari. */
+@media (max-width: 767px) {
+  html {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  * {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  *::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
 }
 
-::-webkit-scrollbar-track {
-  background: #F1ECE3;
-}
+/* Refined scrollbar (thin, stone + gold) — tablet & desktop */
+@media (min-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
 
-::-webkit-scrollbar-thumb {
-  background: #D8CBB2;
-  border-radius: 999px;
-  border: 2px solid #F1ECE3;
-}
+  ::-webkit-scrollbar-track {
+    background: #F1ECE3;
+  }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--gold);
+  ::-webkit-scrollbar-thumb {
+    background: #D8CBB2;
+    border-radius: 999px;
+    border: 2px solid #F1ECE3;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--gold);
+  }
 }
 
 /* ─── Scroll-reveal fade-in ─── */

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Heart, Eye, ShoppingBag } from "lucide-react";
 import type { Product } from "@/data/beautyData";
 import {
@@ -45,18 +46,21 @@ export default function ProductCard({
         className="relative block aspect-square overflow-hidden bg-porcelain"
         aria-label={product.name}
       >
-        <img
+        <Image
           src={product.image}
           alt={product.name}
-          loading={priority ? "eager" : "lazy"}
-          className="absolute inset-0 h-full w-full object-cover transition-all duration-700 group-hover:scale-105 group-hover:opacity-0"
+          fill
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          priority={priority}
+          className="object-cover transition-all duration-700 group-hover:scale-105 group-hover:opacity-0"
         />
-        <img
+        <Image
           src={product.hoverImage || product.image}
           alt=""
           aria-hidden
-          loading="lazy"
-          className="absolute inset-0 h-full w-full scale-105 object-cover opacity-0 transition-all duration-700 group-hover:scale-100 group-hover:opacity-100"
+          fill
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          className="scale-105 object-cover opacity-0 transition-all duration-700 group-hover:scale-100 group-hover:opacity-100"
         />
 
         {/* Badge */}

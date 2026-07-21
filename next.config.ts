@@ -2,16 +2,7 @@ import type { NextConfig } from "next";
 
 const isDev = process.env.NODE_ENV === "development";
 
-/**
- * Content Security Policy — an allowlist of where the browser may load
- * things from. Anything not listed is blocked, which stops attacker-hosted
- * scripts, clickjacking frames, and data exfiltration to unknown domains.
- *
- * Pragmatic tier: keeps 'unsafe-inline' so framer-motion / GSAP / Three.js
- * inline styles keep working. A stricter nonce-based CSP (via proxy.ts) is
- * a good post-launch upgrade. Razorpay uses *.razorpay.com for its script,
- * checkout iframe, and API calls — all allowlisted so payments don't break.
- */
+
 const csp = [
   `default-src 'self'`,
   `script-src 'self' 'unsafe-inline' https://*.razorpay.com${isDev ? " 'unsafe-eval'" : ""}`,
@@ -42,7 +33,14 @@ const nextConfig: NextConfig = {
         hostname: "images.unsplash.com",
       },
     ],
+    // Serve modern formats and cache optimized variants for a week.
+    formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 60 * 60 * 24 * 7,
   },
+
+  // sharp is a native module used by the admin upload route — keep it external
+  // so Next doesn't try to bundle it.
+  serverExternalPackages: ["sharp"],
 
   async headers() {
     return [

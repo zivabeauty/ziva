@@ -1,5 +1,9 @@
+import sharp from "sharp";
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/server/session";
+
+// This route uses sharp (a native module) — force the Node.js runtime.
+export const runtime = "nodejs";
 
 /**
  * Admin image upload → Supabase Storage (`product-images` bucket, public).
@@ -48,9 +52,28 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Image must be 5 MB or smaller." }, { status: 400 });
   }
 
+  // Resize + convert to WebP so stored files are small (typically 1.5 MB PNG
+  // → ~60–120 KB WebP). Falls back to the original bytes if processing fails,
+  // so an upload never breaks over a bad codec.
+  const original = Buffer.from(await file.arrayBuffer());
+  let uploadBuffer: Buffer = original;
+  let uploadExt = ext;
+  let uploadType = file.type;
+  try {
+    uploadBuffer = await sharp(original)
+      .rotate() // honour EXIF orientation before stripping metadata
+      .resize({ width: 1400, height: 1400, fit: "inside", withoutEnlargement: true })
+      .webp({ quality: 82 })
+      .toBuffer();
+    uploadExt = "webp";
+    uploadType = "image/webp";
+  } catch (err) {
+    console.error("Image processing failed — uploading original:", err);
+  }
+
   // Unique, URL-safe object path — never trust the original filename.
   const base = file.name.replace(/\.[^.]+$/, "").replace(/[^a-zA-Z0-9-_]/g, "-").slice(0, 40) || "image";
-  const path = `products/${Date.now()}-${base}.${ext}`;
+  const path = `products/${Date.now()}-${base}.${uploadExt}`;
 
   try {
     const res = await fetch(`${supabaseUrl}/storage/v1/object/${BUCKET}/${path}`, {
@@ -58,10 +81,10 @@ export async function POST(request: Request) {
       headers: {
         Authorization: `Bearer ${secretKey}`,
         apikey: secretKey,
-        "Content-Type": file.type,
+        "Content-Type": uploadType,
         "Cache-Control": "public, max-age=31536000, immutable",
       },
-      body: file,
+      body: new Uint8Array(uploadBuffer),
     });
 
     if (!res.ok) {
