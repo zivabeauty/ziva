@@ -27,9 +27,11 @@ export default function ProductGrid({
     return (
       <div className="mx-auto flex max-w-lg flex-col items-center gap-4 rounded-2xl border border-dashed border-stone-200 bg-cream py-20 text-center">
         <SlidersHorizontal className="h-8 w-8 text-stone-400" />
-        <h3 className="text-base font-bold text-ink">No Matching Products</h3>
+        <h3 className="text-base font-bold text-ink">No Products Yet</h3>
         <p className="max-w-xs text-xs font-medium leading-relaxed text-stone-500">
-          We couldn&apos;t find anything for those filters. Try broadening your selection.
+          {onReset
+            ? "We couldn’t find anything for those filters. Try broadening your selection."
+            : "Add products in the admin panel — they’ll show up here with live prices from your database."}
         </p>
         {onReset && (
           <button

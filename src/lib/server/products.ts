@@ -1,22 +1,30 @@
 import "server-only";
-import { products as staticProducts, type Product } from "@/data/beautyData";
+import type { Product } from "@/data/beautyData";
 import { supabaseAdmin, isSupabaseServerConfigured } from "@/lib/server/supabase-admin";
 
-/** Server-side catalog fetch — Supabase with static fallback. */
+/** Server-side catalog — Supabase only (no static/dummy fallback). */
 export async function getCatalogProducts(): Promise<Product[]> {
-  if (!isSupabaseServerConfigured()) return staticProducts;
+  if (!isSupabaseServerConfigured()) return [];
 
   try {
     const res = await supabaseAdmin("product?select=*&order=id.asc");
-    if (!res.ok) return staticProducts;
+    if (!res.ok) return [];
     const data = (await res.json()) as Product[];
-    return data.length > 0 ? data : staticProducts;
+    return Array.isArray(data) ? data : [];
   } catch {
-    return staticProducts;
+    return [];
   }
 }
 
 export async function getProductById(id: number): Promise<Product | null> {
-  const all = await getCatalogProducts();
-  return all.find((p) => p.id === id) ?? null;
+  if (!isSupabaseServerConfigured()) return null;
+
+  try {
+    const res = await supabaseAdmin(`product?id=eq.${id}&select=*&limit=1`);
+    if (!res.ok) return null;
+    const data = (await res.json()) as Product[];
+    return Array.isArray(data) && data[0] ? data[0] : null;
+  } catch {
+    return null;
+  }
 }

@@ -25,7 +25,7 @@ import {
   Loader2,
   Printer,
 } from "lucide-react";
-import { products as staticProducts, type Product } from "@/data/beautyData";
+import { type Product } from "@/data/beautyData";
 import type { OrderRecord } from "@/lib/cart-types";
 import { useAdminSession, useAdminLogin, useAdminLogout } from "@/features/auth/hooks/useAdminAuth";
 import { ApiError } from "@/types/api";
@@ -470,13 +470,13 @@ export default function AdminPage() {
         setProducts(data);
         setUsingFallbackCatalog(false);
       } else {
-        setProducts(staticProducts);
-        setUsingFallbackCatalog(true);
+        setProducts([]);
+        setUsingFallbackCatalog(false);
       }
     } catch (err) {
       console.error("Failed to fetch products:", err);
-      setProducts(staticProducts);
-      setUsingFallbackCatalog(true);
+      setProducts([]);
+      setUsingFallbackCatalog(false);
     } finally {
       setLoadingProducts(false);
     }

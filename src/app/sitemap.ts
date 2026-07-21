@@ -1,9 +1,11 @@
 import type { MetadataRoute } from "next";
-import { products } from "@/data/beautyData";
+import { getCatalogProducts } from "@/lib/server/products";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.zivabeauty.co.in";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const products = await getCatalogProducts();
+
   const staticPages: MetadataRoute.Sitemap = [
     { url: `${SITE_URL}/`, changeFrequency: "weekly", priority: 1 },
     { url: `${SITE_URL}/products`, changeFrequency: "weekly", priority: 0.9 },

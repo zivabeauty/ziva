@@ -1,12 +1,12 @@
 import "server-only";
-import { products as staticProducts, type Product } from "@/data/beautyData";
+import type { Product } from "@/data/beautyData";
 import { computeTotals, getUnitPrice } from "@/lib/pricing";
 import { isSupabaseServerConfigured, supabaseAdmin } from "./supabase-admin";
 
 /**
  * Server-side cart pricing. The browser only sends product ids, sizes and
- * quantities — prices always come from the product table (or the bundled
- * catalog as fallback), so a tampered client can't change what is charged.
+ * quantities — prices always come from the product table, so a tampered
+ * client can't change what is charged.
  */
 
 export interface CheckoutItemInput {
@@ -25,18 +25,18 @@ export interface PricedCartItem {
 const MAX_QTY_PER_ITEM = 50;
 
 async function loadCatalog(): Promise<Product[]> {
-  if (isSupabaseServerConfigured()) {
-    try {
-      const res = await supabaseAdmin("product?select=*");
-      if (res.ok) {
-        const data = (await res.json()) as Product[];
-        if (Array.isArray(data) && data.length > 0) return data;
-      }
-    } catch (err) {
-      console.error("Falling back to bundled catalog:", err);
+  if (!isSupabaseServerConfigured()) return [];
+
+  try {
+    const res = await supabaseAdmin("product?select=*");
+    if (res.ok) {
+      const data = (await res.json()) as Product[];
+      if (Array.isArray(data)) return data;
     }
+  } catch (err) {
+    console.error("Failed to load catalog for checkout:", err);
   }
-  return staticProducts;
+  return [];
 }
 
 export async function priceCart(

@@ -16,7 +16,6 @@ import {
   ChevronDown,
 } from "lucide-react";
 import Tilt from "@/components/Tilt";
-import { products as staticProducts } from "@/data/beautyData";
 import { useProduct, useProducts } from "@/features/products/hooks/useProducts";
 import { useWishlist } from "@/features/wishlist/hooks/useWishlist";
 import { addToCart, inStock } from "@/lib/product-utils";
@@ -30,40 +29,55 @@ export default function ProductPage() {
   const params = useParams();
   const router = useRouter();
   const idStr = params.id as string;
-  const productId = parseInt(idStr) || 1;
-  const { products: productList } = useProducts();
-  const { data: fetchedProduct } = useProduct(productId);
-  const product = fetchedProduct ?? productList.find((p) => p.id === productId) ?? staticProducts[0];
+  const productId = parseInt(idStr) || 0;
+  const { products: productList, loading: listLoading } = useProducts();
+  const { data: fetchedProduct, isLoading: detailLoading, isError } = useProduct(productId);
+  const product = fetchedProduct ?? productList.find((p) => p.id === productId);
   const { isWishlisted, toggleWishlist } = useWishlist();
 
   const [quantity, setQuantity] = useState(1);
-  const [activeImage, setActiveImage] = useState(product.image);
-
-  // Custom Magnifier Zoom
+  const [activeImage, setActiveImage] = useState("");
   const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 });
   const [zoomed, setZoomed] = useState(false);
-
-  // Fullscreen Lightbox
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
-
-  // Accordion Expanders
   const [expandedSection, setExpandedSection] = useState<string | null>("description");
+  const [prevProductId, setPrevProductId] = useState<number | null>(null);
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  const loading = detailLoading || (listLoading && !product);
+
+  if (product && product.id !== prevProductId) {
+    setPrevProductId(product.id);
+    setActiveImage(product.image);
+    setQuantity(1);
+  }
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center bg-white text-stone-400 text-sm tracking-widest uppercase">
+        Loading product…
+      </div>
+    );
+  }
+
+  if (!product || isError) {
+    return (
+      <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 bg-white px-4 text-center">
+        <p className="text-sm text-stone-500">This product isn’t available.</p>
+        <Link href="/products" className="text-[10px] font-bold uppercase tracking-widest text-[#C9A961] hover:text-black">
+          Back to shop
+        </Link>
+      </div>
+    );
+  }
 
   const available = inStock(product);
+  const displayImage = activeImage || product.image;
 
   // All display images: main + hover + admin gallery, de-duped and non-empty.
   const productImages = [product.image, product.hoverImage, ...(product.gallery ?? [])]
     .filter((img): img is string => Boolean(img))
     .filter((img, i, arr) => arr.indexOf(img) === i);
-
-  // Sync state when a different product renders — adjust-during-render
-  // pattern (avoids a cascading effect re-render).
-  const [prevProductId, setPrevProductId] = useState(product.id);
-  if (product.id !== prevProductId) {
-    setPrevProductId(product.id);
-    setActiveImage(product.image);
-    setQuantity(1);
-  }
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
@@ -80,7 +94,6 @@ export default function ProductPage() {
   const handleWishlist = () => toggleWishlist(product);
   const wishlisted = isWishlisted(product.id);
 
-  const [linkCopied, setLinkCopied] = useState(false);
   const shareProduct = async () => {
     if (!navigator.clipboard) return;
     await navigator.clipboard.writeText(window.location.href);
@@ -152,8 +165,8 @@ export default function ProductPage() {
               onClick={() => setIsLightboxOpen(true)}
             >
               <Image
-                key={activeImage}
-                src={activeImage}
+                key={displayImage}
+                src={displayImage}
                 alt={product.name}
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 70vw, 700px"
@@ -394,7 +407,7 @@ export default function ProductPage() {
             onClick={() => setIsLightboxOpen(false)}
           />
           <div className="relative max-w-2xl w-full aspect-square z-10 rounded-2xl overflow-hidden shadow-2xl">
-            <Image src={activeImage} alt={product.name} fill sizes="(max-width: 768px) 100vw, 672px" quality={90} className="object-cover" />
+            <Image src={displayImage} alt={product.name} fill sizes="(max-width: 768px) 100vw, 672px" quality={90} className="object-cover" />
             <button 
               onClick={() => setIsLightboxOpen(false)}
               className="absolute top-4 right-4 text-white hover:text-[#C9A961] p-2.5 bg-black/50 rounded-full"

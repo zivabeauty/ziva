@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, SlidersHorizontal, ChevronDown, X } from "lucide-react";
-import { products as staticProducts, type Product } from "@/data/beautyData";
+import type { Product } from "@/data/beautyData";
 import { useProducts } from "@/lib/useProducts";
 import { useWishlist } from "@/lib/useWishlist";
 import {
@@ -24,13 +24,13 @@ import QuickView from "@/components/QuickView";
 const SORT_OPTIONS = Object.keys(SORT_LABELS) as SortOption[];
 
 export default function ProductsPage() {
-  const { products } = useProducts();
+  const { products, loading } = useProducts();
   const { wishlistIds, toggleWishlist, isWishlisted } = useWishlist();
 
   const facets = useMemo(() => buildFacets(products), [products]);
 
   const [filters, setFilters] = useState<ProductFilters>(() =>
-    defaultFilters(buildFacets(staticProducts))
+    defaultFilters(buildFacets([]))
   );
   const [sort, setSort] = useState<SortOption>("featured");
   const [quickView, setQuickView] = useState<Product | null>(null);
@@ -162,13 +162,19 @@ export default function ProductsPage() {
 
           {/* ─── Grid ─── */}
           <div className="flex-1">
-            <ProductGrid
-              products={results}
-              wishlistIds={wishlistIds}
-              onToggleWishlist={toggleWishlist}
-              onQuickView={setQuickView}
-              onReset={clearAll}
-            />
+            {loading ? (
+              <div className="flex min-h-[40vh] items-center justify-center text-xs uppercase tracking-widest text-stone-400">
+                Loading products…
+              </div>
+            ) : (
+              <ProductGrid
+                products={results}
+                wishlistIds={wishlistIds}
+                onToggleWishlist={toggleWishlist}
+                onQuickView={setQuickView}
+                onReset={clearAll}
+              />
+            )}
           </div>
         </div>
       </div>
