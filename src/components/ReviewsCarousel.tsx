@@ -19,9 +19,9 @@ export default function ReviewsCarousel() {
   };
 
   return (
-    <section className="bg-white py-14 sm:py-12 border-t border-black/10">
+    <section className="bg-white py-12 sm:py-16 border-t border-black/10">
       <div className="mx-auto max-w-8xl px-4 sm:px-6 lg:px-8">
-        <h2 className="mb-10 text-center text-[26px] font-bold text-black sm:mb-14 sm:text-[32px]">
+        <h2 className="mb-8 text-center text-[26px] font-bold text-black sm:mb-10 sm:text-[32px]">
           Love That Keeps Us Going
         </h2>
 

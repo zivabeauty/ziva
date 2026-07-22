@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { getProductById } from "@/lib/server/products";
 
+export const revalidate = 300;
+
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }

@@ -9,11 +9,11 @@
  */
 
 const TAGS = [
-  "Paraben Free",
-  "Vegetarian",
-  "Cruelty Free",
-  "Dermatologist Tested",
-  "Sulphate Free",
+  "Premium Beauty Products",
+  "Skincare",
+  "Makeup",
+  "Hair Care",
+  "Beauty Kits",
 ];
 
 function TagGroup() {

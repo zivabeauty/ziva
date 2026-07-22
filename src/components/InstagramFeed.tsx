@@ -34,7 +34,7 @@ const src = (id: string, h: number) =>
 
 export default function InstagramFeed() {
   return (
-    <section className="bg-white py-14 sm:py-20">
+    <section className="bg-white py-12 sm:py-16">
       <div className="mb-8 px-4 text-center sm:mb-10">
         <h2 className="text-[26px] font-bold tracking-tight text-ink sm:text-[32px]">
           Follow Us On Instagram

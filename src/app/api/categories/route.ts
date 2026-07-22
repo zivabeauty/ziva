@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { categories as staticCategories } from "@/data/beautyData";
 import { getCatalogProducts } from "@/lib/server/products";
 
+export const revalidate = 300;
+
 export async function GET() {
   const products = await getCatalogProducts();
   const categoryMap = new Map<string, number>();

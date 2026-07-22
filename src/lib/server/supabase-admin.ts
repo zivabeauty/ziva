@@ -29,14 +29,19 @@ export async function supabaseAdmin(
     );
   }
 
+  // Default to no-store (writes / admin reads must be fresh), but let callers
+  // opt into caching by passing `cache` or `next` (e.g. the public catalog).
+  const { headers: initHeaders, ...restInit } = init;
+  const hasCacheOpt = "cache" in init || "next" in init;
+
   return fetch(`${SUPABASE_URL}/rest/v1/${query}`, {
-    ...init,
+    ...(hasCacheOpt ? {} : { cache: "no-store" }),
+    ...restInit,
     headers: {
       "Content-Type": "application/json",
       apikey: SERVER_KEY,
       Authorization: `Bearer ${SERVER_KEY}`,
-      ...init.headers,
+      ...initHeaders,
     },
-    cache: "no-store",
   });
 }

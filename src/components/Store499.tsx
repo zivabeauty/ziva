@@ -14,7 +14,7 @@ const PRICE_TIERS = [
 
 export default function Store499() {
   return (
-    <section className="bg-white bg-white py-5 sm:py-5">
+    <section className="bg-white py-12 sm:py-16">
       <div className="mx-auto max-w-8xl px-4 sm:px-6 lg:px-8">
         <h2 className="mb-8 text-2xl font-bold tracking-tight text-ink sm:mb-10 sm:text-[40px]">
           Shop by Price <span className="align-super text-3xl text-gold-deep">*</span>
