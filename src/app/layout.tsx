@@ -16,26 +16,70 @@ const playfair = Playfair_Display({
   display: "swap",
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.zivabeauty.co.in";
+
+const HOME_TITLE = "Beauty Products Online | Shop Skincare, Makeup & Hair Care | Ziva Beauty";
+const HOME_DESCRIPTION =
+  "Shop beauty products online at Ziva Beauty. Explore skincare, makeup, hair care, and beauty essentials for your everyday routine. Find products designed to help you look and feel your best every day.";
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "ZIVA — Luxury Beauty, Skincare & Makeup",
-    template: "%s — ZIVA",
+    default: HOME_TITLE,
+    template: "%s — Ziva Beauty",
   },
-  description:
-    "Refined, clean-beauty skincare and makeup — crafted with premium botanicals and gold-standard actives for visible, lasting radiance.",
+  description: HOME_DESCRIPTION,
+  alternates: { canonical: "/" },
   openGraph: {
-    title: "ZIVA — Luxury Beauty, Skincare & Makeup",
-    description:
-      "Refined, clean-beauty skincare and makeup — crafted with premium botanicals and gold-standard actives.",
-    siteName: "ZIVA",
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
+    siteName: "Ziva Beauty",
+    url: "/",
     type: "website",
-    images: [{ url: "/ziva5.webp", width: 1200, height: 630, alt: "ZIVA Beauty" }],
+    locale: "en_IN",
+    images: [
+      { url: "/og-home.webp", width: 1200, height: 630, alt: "Ziva Beauty - Beauty Products Online" },
+    ],
   },
   twitter: {
     card: "summary_large_image",
+    site: "@ZivaBeauty",
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
+    images: ["/og-home.webp"],
   },
   robots: { index: true, follow: true },
+};
+
+// Site-wide structured data (Organization + WebSite for sitelinks search box).
+const orgJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Ziva Beauty",
+  alternateName: "Ziva Beauty India",
+  url: `${SITE_URL}/`,
+  logo: `${SITE_URL}/ziva_beauty_logo.webp`,
+  description:
+    "Ziva Beauty is an online beauty brand offering skincare, hair care, makeup and beauty essentials for everyday routines.",
+  sameAs: [
+    "https://www.instagram.com/zivabeauty__cosmetics/",
+    "https://pin.it/kdY5smgIr",
+  ],
+};
+
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Ziva Beauty",
+  url: `${SITE_URL}/`,
+  potentialAction: {
+    "@type": "SearchAction",
+    target: {
+      "@type": "EntryPoint",
+      urlTemplate: `${SITE_URL}/products?q={search_term_string}`,
+    },
+    "query-input": "required name=search_term_string",
+  },
 };
 
 export const viewport: Viewport = {
@@ -52,6 +96,14 @@ export default function RootLayout({
   return (
     <html lang="en" className={`h-full antialiased ${inter.variable} ${playfair.variable}`}>
       <body className="min-h-full flex flex-col font-sans">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+        />
         <AppProviders>{children}</AppProviders>
       </body>
     </html>

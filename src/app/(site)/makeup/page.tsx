@@ -3,11 +3,30 @@ import Link from "next/link";
 import { Sparkles, Leaf, Palette, HeartHandshake } from "lucide-react";
 import CategoryProductGrid from "@/components/CategoryProductGrid";
 
+const TITLE = "Makeup Products Online | Primer, Foundation & Mascara | Ziva Beauty";
+const DESCRIPTION =
+  "Shop makeup products online at Ziva Beauty. Explore Makeup Primer, Liquid Foundation, Waterproof Mascara, Eyeliner, Korean Glow Kit, and Bridal Glow Kit.";
+
 export const metadata: Metadata = {
-  title: "Makeup Products for Every Look | Ziva Beauty",
-  description:
-    "Shop makeup products online at Ziva Beauty. Explore Makeup Primer, Liquid Foundation, Waterproof Mascara, Eyeliner, Korean Glow Kit, and Bridal Glow Kit.",
+  title: { absolute: TITLE },
+  description: DESCRIPTION,
   alternates: { canonical: "/makeup" },
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    siteName: "Ziva Beauty",
+    url: "/makeup",
+    type: "website",
+    locale: "en_IN",
+    images: [{ url: "/makeup_banner.webp", width: 1200, height: 630, alt: "Ziva Beauty Makeup Products" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@ZivaBeauty",
+    title: TITLE,
+    description: DESCRIPTION,
+    images: ["/makeup_banner.webp"],
+  },
 };
 
 const HERO_IMAGE = "/makeup_banner.webp";

@@ -3,11 +3,30 @@ import Link from "next/link";
 import { ArrowRight, Leaf, Droplets, HeartHandshake, Sparkles } from "lucide-react";
 import SkincareProductGrid from "@/components/SkincareProductGrid";
 
+const TITLE = "Skincare Products Online | Face Packs & Exfoliators | Ziva Beauty";
+const DESCRIPTION =
+  "Shop skincare products online at Ziva Beauty. Explore face packs, exfoliators and everyday skincare essentials designed for healthy-looking, glowing skin.";
+
 export const metadata: Metadata = {
-  title: "Skincare Products for Daily Face Care | Ziva Beauty",
-  description:
-    "Shop skincare products for your daily routine. Explore Ziva Beauty's D-Tan Face Pack and Face Exfoliator for healthy-looking, refreshed skin.",
+  title: { absolute: TITLE },
+  description: DESCRIPTION,
   alternates: { canonical: "/skincare" },
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    siteName: "Ziva Beauty",
+    url: "/skincare",
+    type: "website",
+    locale: "en_IN",
+    images: [{ url: "/skin_carebanner.webp", width: 1200, height: 630, alt: "Ziva Beauty Skincare Products" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@ZivaBeauty",
+    title: TITLE,
+    description: DESCRIPTION,
+    images: ["/skin_carebanner.webp"],
+  },
 };
 
 const highlights = [

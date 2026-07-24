@@ -2,11 +2,30 @@ import type { Metadata } from "next";
 import { Sparkles, Leaf, Droplets, HeartHandshake } from "lucide-react";
 import CategoryProductGrid from "@/components/CategoryProductGrid";
 
+const TITLE = "Hair Care Products Online | Shampoo & Hair Mask | Ziva Beauty";
+const DESCRIPTION =
+  "Shop hair care products online at Ziva Beauty. Discover shampoos, hair masks and everyday hair care essentials for smooth, healthy-looking hair.";
+
 export const metadata: Metadata = {
-  title: "Hair Care Products for Healthy Hair | Ziva Beauty",
-  description:
-    "Shop hair care products online at Ziva Beauty. Explore our Keratin Shampoo and Keratin Hair Mask for a simple everyday hair care routine.",
+  title: { absolute: TITLE },
+  description: DESCRIPTION,
   alternates: { canonical: "/hair-care" },
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    siteName: "Ziva Beauty",
+    url: "/hair-care",
+    type: "website",
+    locale: "en_IN",
+    images: [{ url: "/hair_carebanner.webp", width: 1200, height: 630, alt: "Ziva Beauty Hair Care Products" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@ZivaBeauty",
+    title: TITLE,
+    description: DESCRIPTION,
+    images: ["/hair_carebanner.webp"],
+  },
 };
 
 
