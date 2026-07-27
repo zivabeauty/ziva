@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getProductById } from "@/lib/server/products";
+import { getCatalogProducts, getProductById } from "@/lib/server/products";
 import { products as staticProducts, type Product } from "@/data/beautyData";
 import ProductDetailClient from "@/components/ProductDetailClient";
 
@@ -7,6 +7,20 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.zivabeauty.co.
 
 interface Props {
   params: Promise<{ id: string }>;
+}
+
+export async function generateStaticParams() {
+  try {
+    const dbProducts = await getCatalogProducts();
+    const productsList = dbProducts.length > 0 ? dbProducts : staticProducts;
+    return productsList.map((p) => ({
+      id: String(p.id),
+    }));
+  } catch {
+    return staticProducts.map((p) => ({
+      id: String(p.id),
+    }));
+  }
 }
 
 async function getServerProduct(id: number): Promise<Product | null> {
