@@ -6,9 +6,8 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: "*",
-      allow: "/",
+      allow: ["/", "/products", "/product/", "/skincare", "/hair-care", "/makeup", "/about", "/contact", "/returns"],
       disallow: [
-        // Private & utility pages
         "/cart",
         "/checkout",
         "/account",
@@ -20,16 +19,7 @@ export default function robots(): MetadataRoute.Robots {
         "/search",
         "/api/",
         "/admin/",
-        // Faceted / tracking URL parameters (avoid duplicate-content crawling)
-        "/*?q=",
-        "/*?search=",
-        "/*?sort=",
-        "/*?filter=",
-        "/*?page=",
-        "/*?price=",
-        "/*?color=",
-        "/*?size=",
-        "/*?variant=",
+        // Filter out tracking query params while keeping product URLs crawlable
         "/*?utm_",
         "/*?gclid=",
         "/*?fbclid=",

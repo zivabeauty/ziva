@@ -5,11 +5,11 @@ const isDev = process.env.NODE_ENV === "development";
 
 const csp = [
   `default-src 'self'`,
-  `script-src 'self' 'unsafe-inline' https://*.razorpay.com${isDev ? " 'unsafe-eval'" : ""}`,
+  `script-src 'self' 'unsafe-inline' https://*.razorpay.com https://www.googletagmanager.com https://*.googletagmanager.com https://*.google-analytics.com${isDev ? " 'unsafe-eval'" : ""}`,
   `style-src 'self' 'unsafe-inline'`,
-  `img-src 'self' data: blob: https://*.supabase.co https://images.unsplash.com https://*.razorpay.com`,
+  `img-src 'self' data: blob: https://*.supabase.co https://images.unsplash.com https://*.razorpay.com https://www.googletagmanager.com https://*.google-analytics.com`,
   `font-src 'self' data:`,
-  `connect-src 'self' https://*.supabase.co https://*.razorpay.com`,
+  `connect-src 'self' https://*.supabase.co https://*.razorpay.com https://*.google-analytics.com https://*.googletagmanager.com https://*.analytics.google.com`,
   `frame-src https://*.razorpay.com`,
   `worker-src 'self' blob:`,
   `object-src 'none'`,
