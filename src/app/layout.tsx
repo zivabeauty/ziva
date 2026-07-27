@@ -30,6 +30,11 @@ export const metadata: Metadata = {
   },
   description: HOME_DESCRIPTION,
   alternates: { canonical: "/" },
+  icons: {
+    icon: [{ url: "/Logo.webp", type: "image/webp" }],
+    shortcut: "/Logo.webp",
+    apple: "/Logo.webp",
+  },
   verification: {
     google: "bhd_G7-vh7_ZaWxpWoi70vnTGzIAN7xDX6-PlgDju9M",
   },
