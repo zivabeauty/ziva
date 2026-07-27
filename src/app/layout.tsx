@@ -30,6 +30,9 @@ export const metadata: Metadata = {
   },
   description: HOME_DESCRIPTION,
   alternates: { canonical: "/" },
+  verification: {
+    google: "bhd_G7-vh7_ZaWxpWoi70vnTGzIAN7xDX6-PlgDju9M",
+  },
   openGraph: {
     title: HOME_TITLE,
     description: HOME_DESCRIPTION,
