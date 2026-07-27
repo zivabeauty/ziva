@@ -1,424 +1,164 @@
-"use client";
+import type { Metadata } from "next";
+import { getProductById } from "@/lib/server/products";
+import { products as staticProducts, type Product } from "@/data/beautyData";
+import ProductDetailClient from "@/components/ProductDetailClient";
 
-import { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
-import {
-  Star,
-  Heart,
-  ShoppingBag,
-  ChevronRight,
-  Plus,
-  Minus,
-  ArrowLeft,
-  Share2,
-  ChevronDown,
-} from "lucide-react";
-import Tilt from "@/components/Tilt";
-import { useProduct, useProducts } from "@/features/products/hooks/useProducts";
-import { useWishlist } from "@/features/wishlist/hooks/useWishlist";
-import { addToCart, inStock } from "@/lib/product-utils";
-import Price from "@/components/ui/Price";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.zivabeauty.co.in";
 
-/** Tiny neutral blur so the main photo feels instant while the real file loads. */
-const IMAGE_BLUR =
-  "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPjxyZWN0IHdpZHRoPSI4IiBoZWlnaHQ9IjgiIGZpbGw9IiNmNWY1ZjQiLz48L3N2Zz4=";
+interface Props {
+  params: Promise<{ id: string }>;
+}
 
-export default function ProductPage() {
-  const params = useParams();
-  const router = useRouter();
-  const idStr = params.id as string;
-  const productId = parseInt(idStr) || 0;
-  const { products: productList, loading: listLoading } = useProducts();
-  const { data: fetchedProduct, isLoading: detailLoading, isError } = useProduct(productId);
-  const product = fetchedProduct ?? productList.find((p) => p.id === productId);
-  const { isWishlisted, toggleWishlist } = useWishlist();
+async function getServerProduct(id: number): Promise<Product | null> {
+  try {
+    const dbProd = await getProductById(id);
+    if (dbProd) return dbProd;
+  } catch {
+    // Ignore error and try fallback
+  }
+  return staticProducts.find((p) => p.id === id) ?? null;
+}
 
-  const [quantity, setQuantity] = useState(1);
-  const [activeImage, setActiveImage] = useState("");
-  const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 });
-  const [zoomed, setZoomed] = useState(false);
-  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
-  const [expandedSection, setExpandedSection] = useState<string | null>("description");
-  const [prevProductId, setPrevProductId] = useState<number | null>(null);
-  const [linkCopied, setLinkCopied] = useState(false);
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  const productId = parseInt(id, 10) || 0;
+  const product = await getServerProduct(productId);
 
-  const loading = detailLoading || (listLoading && !product);
-
-  if (product && product.id !== prevProductId) {
-    setPrevProductId(product.id);
-    setActiveImage(product.image);
-    setQuantity(1);
+  if (!product) {
+    return {
+      title: "Product Not Found | Ziva Beauty",
+      description: "The requested beauty product could not be found.",
+      robots: { index: false },
+    };
   }
 
-  if (loading) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center bg-white text-stone-400 text-sm tracking-widest uppercase">
-        Loading product…
-      </div>
-    );
-  }
+  const title = `${product.name} | Ziva Beauty`;
+  const description =
+    product.description ||
+    `Shop ${product.name} online at Ziva Beauty. High quality skincare and beauty essentials.`;
+  const canonicalUrl = `${SITE_URL}/product/${product.id}`;
+  const imageUrl = product.image.startsWith("http")
+    ? product.image
+    : `${SITE_URL}${product.image}`;
 
-  if (!product || isError) {
-    return (
-      <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 bg-white px-4 text-center">
-        <p className="text-sm text-stone-500">This product isn’t available.</p>
-        <Link href="/products" className="text-[10px] font-bold uppercase tracking-widest text-[#C9A961] hover:text-black">
-          Back to shop
-        </Link>
-      </div>
-    );
-  }
-
-  const available = inStock(product);
-  const displayImage = activeImage || product.image;
-
-  // All display images: main + hover + admin gallery, de-duped and non-empty.
-  const productImages = [product.image, product.hoverImage, ...(product.gallery ?? [])]
-    .filter((img): img is string => Boolean(img))
-    .filter((img, i, arr) => arr.indexOf(img) === i);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - left) / width) * 100;
-    const y = ((e.clientY - top) / height) * 100;
-    setZoomPos({ x, y });
+  return {
+    title: { absolute: title },
+    description,
+    alternates: { canonical: canonicalUrl },
+    openGraph: {
+      title,
+      description,
+      url: canonicalUrl,
+      siteName: "Ziva Beauty",
+      type: "website",
+      locale: "en_IN",
+      images: [
+        {
+          url: imageUrl,
+          alt: product.name,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      site: "@ZivaBeauty",
+      title,
+      description,
+      images: [imageUrl],
+    },
+    robots: { index: true, follow: true },
   };
+}
 
-  const handleAddToCart = () => {
-    if (!available) return;
-    addToCart(product, quantity);
-  };
+export default async function ProductPage({ params }: Props) {
+  const { id } = await params;
+  const productId = parseInt(id, 10) || 0;
+  const product = await getServerProduct(productId);
 
-  const handleWishlist = () => toggleWishlist(product);
-  const wishlisted = isWishlisted(product.id);
+  // Parse numeric price for schema.org
+  const numericPrice = product
+    ? parseFloat(product.price.replace(/[^0-9.]/g, "")) || 0
+    : 0;
 
-  const shareProduct = async () => {
-    if (!navigator.clipboard) return;
-    await navigator.clipboard.writeText(window.location.href);
-    setLinkCopied(true);
-    setTimeout(() => setLinkCopied(false), 2000);
-  };
+  const productJsonLd = product
+    ? {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        name: product.name,
+        image: product.image.startsWith("http") ? product.image : `${SITE_URL}${product.image}`,
+        description: product.description,
+        brand: {
+          "@type": "Brand",
+          name: "Ziva Beauty",
+        },
+        category: product.category,
+        offers: {
+          "@type": "Offer",
+          priceCurrency: "INR",
+          price: numericPrice,
+          availability: "https://schema.org/InStock",
+          url: `${SITE_URL}/product/${product.id}`,
+        },
+        ...(product.rating
+          ? {
+              aggregateRating: {
+                "@type": "AggregateRating",
+                ratingValue: product.rating,
+                reviewCount: product.reviews || 152,
+              },
+            }
+          : {}),
+      }
+    : null;
 
-  const toggleSection = (section: string) => {
-    setExpandedSection(expandedSection === section ? null : section);
-  };
+  const breadcrumbsJsonLd = product
+    ? {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: `${SITE_URL}/`,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Shop",
+            item: `${SITE_URL}/products`,
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: product.category,
+            item: `${SITE_URL}/products?category=${encodeURIComponent(product.category)}`,
+          },
+          {
+            "@type": "ListItem",
+            position: 4,
+            name: product.name,
+            item: `${SITE_URL}/product/${product.id}`,
+          },
+        ],
+      }
+    : null;
 
   return (
-    <div className="bg-white text-black min-h-screen font-sans selection:bg-[#C9A961] selection:text-black pb-24">
-      
-      {/* Dynamic Breadcrumbs */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex items-center gap-2 text-xs text-stone-500 font-light border-b border-stone-100 select-none">
-        <Link href="/" className="hover:text-black transition-colors uppercase tracking-widest font-semibold flex items-center gap-1.5">
-          <ArrowLeft className="w-3.5 h-3.5" /> Back to Home
-        </Link>
-        <ChevronRight className="w-3 h-3" />
-        <span>Shop</span>
-        <ChevronRight className="w-3 h-3" />
-        <span className="uppercase tracking-widest text-[#C9A961] font-semibold">{product.category}</span>
-        <ChevronRight className="w-3 h-3" />
-        <span className="text-black line-clamp-1">{product.name}</span>
-      </div>
-
-      {/* Main product display */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
-        
-        {/* Left Side: Photo gallery with vertical thumbnails */}
-        <div className="lg:col-span-7 flex flex-col-reverse md:flex-row gap-6 items-start">
-          
-          {/* Vertical thumbnail list */}
-          <div className="flex flex-row md:flex-col gap-4 w-full md:w-24 overflow-x-auto md:overflow-x-visible">
-            {productImages.map((img, idx) => (
-              <button
-                key={img}
-                type="button"
-                onClick={() => setActiveImage(img)}
-                className={`relative w-20 md:w-full aspect-square border overflow-hidden transition-all rounded-xl shrink-0 ${
-                  activeImage === img ? "border-[#C9A961] scale-102 shadow-xs" : "border-stone-200 opacity-60 hover:opacity-100"
-                }`}
-              >
-                <Image
-                  src={img}
-                  alt={`${product.name} view ${idx + 1}`}
-                  fill
-                  sizes="80px"
-                  quality={60}
-                  loading={idx < 2 ? "eager" : "lazy"}
-                  className="object-cover"
-                />
-              </button>
-            ))}
-          </div>
-
-          {/* Main Photo Box with high-res mouse magnifier */}
-          <div className="flex-grow w-full relative">
-            <span className="absolute top-6 left-6 z-10 px-3 py-1 bg-black text-[#C9A961] border border-[#C9A961] text-[8px] uppercase font-bold tracking-widest rounded-full">
-              {product.badge}
-            </span>
-
-            <div 
-              className="relative aspect-square w-full bg-stone-50 overflow-hidden border border-stone-200/50 rounded-2xl cursor-zoom-in shadow-xs"
-              onMouseMove={handleMouseMove}
-              onMouseEnter={() => setZoomed(true)}
-              onMouseLeave={() => setZoomed(false)}
-              onClick={() => setIsLightboxOpen(true)}
-            >
-              <Image
-                key={displayImage}
-                src={displayImage}
-                alt={product.name}
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 70vw, 700px"
-                quality={75}
-                priority
-                fetchPriority="high"
-                placeholder="blur"
-                blurDataURL={IMAGE_BLUR}
-                className="object-cover transition-transform duration-100"
-                style={zoomed ? {
-                  transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
-                  transform: "scale(1.8)"
-                } : undefined}
-              />
-            </div>
-            <span className="text-[9px] uppercase tracking-widest text-stone-400 font-light block mt-3 text-center">
-              Click to view fullscreen lookbook
-            </span>
-          </div>
-
-        </div>
-
-        {/* Right Side: details & accordions */}
-        <div className="lg:col-span-5 flex flex-col justify-between">
-          <div className="flex flex-col gap-6">
-            
-            <div className="flex flex-col gap-2">
-              <span className="text-[9px] text-[#C9A961] font-bold uppercase tracking-[0.25em]">{product.category}</span>
-              <h1 className="text-3xl font-light font-serif tracking-wide text-[#111111] uppercase leading-tight">
-                {product.name}
-              </h1>
-              
-              <div className="flex items-center gap-4 mt-2">
-                <div className="flex gap-0.5 text-[#C9A961]">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-3.5 h-3.5 fill-[#C9A961] text-[#C9A961]" />
-                  ))}
-                </div>
-                <span className="text-xs text-stone-450 font-light">(152 Verified Reviews)</span>
-              </div>
-            </div>
-
-            {/* Price & availability */}
-            <div className="flex flex-col gap-1 border-y border-stone-150 py-4">
-              <div className="flex items-center gap-4">
-                <Price price={product.price} oldPrice={product.oldPrice} size="lg" />
-              </div>
-              <div className="flex justify-between text-[10px] text-stone-400 font-light tracking-wide mt-1">
-                <span>
-                  Availability:{" "}
-                  {available ? (
-                    <strong className="text-emerald-600 font-medium">In Stock</strong>
-                  ) : (
-                    <strong className="text-rose-600 font-medium">Out of Stock</strong>
-                  )}
-                </span>
-              </div>
-            </div>
-
-            <p className="text-stone-500 text-xs sm:text-sm font-light leading-relaxed">
-              {product.description}
-            </p>
-
-            {/* Quantity selection */}
-            <div>
-              <span className="text-[9px] uppercase tracking-[0.2em] text-stone-400 font-bold block mb-2.5">Quantity</span>
-              <div className="flex items-center border border-stone-200 w-28 rounded-full overflow-hidden">
-                <button 
-                  onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                  className="flex-1 py-2 text-stone-500 hover:text-black font-semibold text-xs flex justify-center items-center"
-                >
-                  <Minus className="w-3.5 h-3.5" />
-                </button>
-                <span className="flex-1 text-center text-xs font-semibold text-black select-none">{quantity}</span>
-                <button 
-                  onClick={() => setQuantity(q => q + 1)}
-                  className="flex-1 py-2 text-stone-500 hover:text-black font-semibold text-xs flex justify-center items-center"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-
-            {/* Action buttons */}
-            <div className="flex gap-4 pt-6 mt-2 border-t border-stone-100">
-              <button
-                onClick={handleAddToCart}
-                disabled={!available}
-                className={`flex-grow py-4 text-[10px] font-bold uppercase tracking-[0.25em] transition-all rounded-full flex items-center justify-center gap-2 group/btn ${
-                  available 
-                    ? "bg-[#C9A961] text-black hover:bg-black hover:text-white shadow-[0_8px_25px_rgba(201,162,39,0.15)]" 
-                    : "bg-stone-150 text-stone-400 cursor-not-allowed border border-stone-200"
-                }`}
-              >
-                <ShoppingBag className="w-4 h-4" /> Add to Bag
-              </button>
-
-              <button 
-                onClick={handleWishlist}
-                className="p-4 border border-stone-200 text-stone-600 hover:text-black hover:border-black transition-all rounded-full flex items-center justify-center cursor-pointer"
-                aria-label="Add to Wishlist"
-              >
-                <Heart className={`w-4.5 h-4.5 ${wishlisted ? "text-red-500 fill-red-500" : ""}`} />
-              </button>
-
-              <div className="relative">
-                <button
-                  onClick={shareProduct}
-                  className="p-4 border border-stone-200 text-stone-650 hover:text-black hover:border-black transition-all rounded-full flex items-center justify-center cursor-pointer"
-                  aria-label="Share product"
-                >
-                  <Share2 className="w-4.5 h-4.5" />
-                </button>
-                {linkCopied && (
-                  <span className="absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap bg-ink text-white text-[9px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg">
-                    Link copied
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* Accordions */}
-            <div className="mt-8 flex flex-col border-t border-stone-200">
-              {[
-                { id: "description", label: "Description", content: `${product.description} Formulated clinically with natural active bases to preserve cellular density.` },
-                { id: "ingredients", label: "Ingredients", content: product.ingredients || "Ascorbyl Glucoside, Colloidal Gold, Rosehip Seed Oil, Hyaluronic Acids." },
-                { id: "benefits", label: "Benefits", content: "Nourishes deeply, targets blemishes, restores natural cell hydration, and adds satin elasticity." },
-                { id: "usage", label: "How to Use", content: product.usage || "Apply 3 drops morning and evening onto clean, dry skin. Press lightly until absorbed." },
-                { id: "shipping", label: "Shipping & Returns", content: "Free shipping on all orders. Carbon-neutral priority carrier transit. Easy 30-day returns." }
-              ].map((sect) => (
-                <div key={sect.id} className="border-b border-stone-200 py-3">
-                  <button 
-                    onClick={() => toggleSection(sect.id)}
-                    className="w-full flex justify-between items-center text-[10px] uppercase font-bold tracking-widest text-[#111111] hover:text-[#C9A961] transition-colors"
-                  >
-                    <span>{sect.label}</span>
-                    <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${expandedSection === sect.id ? "rotate-180 text-[#C9A961]" : "text-stone-400"}`} />
-                  </button>
-                  {expandedSection === sect.id && (
-                    <p className="text-[11px] text-stone-500 font-light leading-relaxed mt-2.5 pl-1">
-                      {sect.content}
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-
-      {/* RELATED PRODUCTS SECTION */}
-      <section className="bg-stone-50/50 border-t border-stone-100 py-20 mt-16 select-none">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-xl mx-auto mb-12">
-            <span className="text-[9px] font-bold tracking-[0.3em] text-[#C9A961] uppercase">Related Rituals</span>
-            <h2 className="text-2xl font-light font-serif uppercase tracking-widest text-[#111111] mt-2">
-              Complete Your Ceremony
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {productList.slice(0, 4).filter(p => p.id !== product.id).map((prod) => (
-              <Tilt key={prod.id}>
-                <div className="group bg-white border border-stone-200/50 p-4 transition-all duration-300 flex flex-col justify-between hover:shadow-md rounded-2xl h-full">
-                  <div className="relative aspect-square overflow-hidden bg-stone-50 mb-4 rounded-xl border border-stone-100">
-                    <Image src={prod.image} alt={prod.name} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="object-cover group-hover:scale-102 transition-transform duration-500" />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <h4 className="text-xs font-semibold text-stone-900 tracking-wide line-clamp-1 mb-1">{prod.name}</h4>
-                    <span className="text-xs font-bold text-[#C9A961]"><Price price={prod.price} oldPrice={prod.oldPrice} size="sm" showDiscount={false} /></span>
-                  </div>
-                  <button 
-                    onClick={() => router.push(`/product/${prod.id}`)}
-                    className="w-full py-2.5 bg-black text-white hover:bg-[#C9A961] hover:text-black text-[9px] font-bold uppercase tracking-widest mt-4 transition-all rounded-full"
-                  >
-                    View Product
-                  </button>
-                </div>
-              </Tilt>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* RECENTLY VIEWED PRODUCTS WIDGET */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-stone-100 select-none">
-        <div className="mb-8">
-          <span className="text-[9px] font-bold tracking-[0.3em] text-[#C9A961] uppercase">Your History</span>
-          <h3 className="text-lg font-light font-serif uppercase tracking-wider text-[#111111]">Recently Viewed</h3>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
-          {productList.slice(1, 3).map((prod) => (
-            <div key={prod.id} className="flex gap-4 items-center p-3 border border-stone-150 bg-[#FAF8F5] rounded-2xl max-w-[280px]">
-              <Image src={prod.image} alt={prod.name} width={56} height={56} sizes="56px" className="h-14 w-14 object-cover rounded-xl border border-stone-200/40" />
-              <div className="flex flex-col justify-between h-full">
-                <div>
-                  <h4 className="text-xs font-semibold text-stone-900 line-clamp-1">{prod.name}</h4>
-                  <span className="text-xs font-bold text-black block mt-0.5">
-                    <Price price={prod.price} oldPrice={prod.oldPrice} size="sm" showDiscount={false} />
-                  </span>
-                </div>
-                <Link href={`/product/${prod.id}`} className="text-[9px] font-bold uppercase tracking-wider text-[#C9A961] hover:text-black mt-2">
-                  View Detail
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Mobile Sticky CTA Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-30 bg-white/90 backdrop-blur-xl border-t border-stone-200 py-3.5 px-4 flex sm:hidden items-center justify-between shadow-lg">
-        <div className="flex flex-col">
-          <span className="text-[8px] uppercase tracking-widest text-stone-400">Total Price</span>
-          <span className="text-sm font-bold text-black">
-            <Price price={product.price} oldPrice={product.oldPrice} size="sm" showDiscount={false} />
-          </span>
-        </div>
-        <button 
-          onClick={handleAddToCart}
-          disabled={!available}
-          className={`px-6 py-2.5 text-[9px] font-bold uppercase tracking-widest rounded-full ${
-            available ? "bg-[#C9A961] text-black" : "bg-stone-200 text-stone-450 cursor-not-allowed"
-          }`}
-        >
-          Add To Bag
-        </button>
-      </div>
-
-      {/* Fullscreen Lightbox Overlay */}
-      {isLightboxOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div 
-            className="absolute inset-0 bg-black/95 backdrop-blur-xs cursor-zoom-out"
-            onClick={() => setIsLightboxOpen(false)}
-          />
-          <div className="relative max-w-2xl w-full aspect-square z-10 rounded-2xl overflow-hidden shadow-2xl">
-            <Image src={displayImage} alt={product.name} fill sizes="(max-width: 768px) 100vw, 672px" quality={90} className="object-cover" />
-            <button 
-              onClick={() => setIsLightboxOpen(false)}
-              className="absolute top-4 right-4 text-white hover:text-[#C9A961] p-2.5 bg-black/50 rounded-full"
-              aria-label="Close lookbook"
-            >
-              <Minus className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
+    <>
+      {productJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+        />
       )}
-
-    </div>
+      {breadcrumbsJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsJsonLd) }}
+        />
+      )}
+      <ProductDetailClient initialProduct={product} productId={productId} />
+    </>
   );
 }

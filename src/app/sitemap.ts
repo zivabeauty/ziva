@@ -1,10 +1,12 @@
 import type { MetadataRoute } from "next";
 import { getCatalogProducts } from "@/lib/server/products";
+import { products as staticProducts } from "@/data/beautyData";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.zivabeauty.co.in";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const products = await getCatalogProducts();
+  const dbProducts = await getCatalogProducts();
+  const productsList = dbProducts.length > 0 ? dbProducts : staticProducts;
   const lastModified = new Date();
 
   const staticPages: MetadataRoute.Sitemap = [
@@ -18,12 +20,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/returns`, lastModified, changeFrequency: "yearly", priority: 0.3 },
   ];
 
-  const productPages: MetadataRoute.Sitemap = products.map((p) => ({
-    url: `${SITE_URL}/product/${p.id}`,
-    lastModified,
-    changeFrequency: "weekly",
-    priority: 0.8,
-  }));
+  const productMap = new Map();
+  productsList.forEach((p) => {
+    productMap.set(p.id, {
+      url: `${SITE_URL}/product/${p.id}`,
+      lastModified,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    });
+  });
 
-  return [...staticPages, ...productPages];
+  return [...staticPages, ...Array.from(productMap.values())];
 }
